@@ -1,0 +1,30 @@
+{
+  "project_name": "ros2-robot-stack",
+  "environment": {
+    "host_os": "Windows",
+    "execution_runtime": "WSL 2 / Docker",
+    "notes": "Code lives on Windows FS, executes in Linux Subsystem."
+  },
+  "services": {
+    "frontend": {
+      "path": "apps/frontend",
+      "runtime": "Node (WSL)",
+      "port": 3000
+    },
+    "backend": {
+      "path": "apps/backend",
+      "runtime": "Node (WSL)",
+      "port": 4000
+    },
+    "ml-service": {
+      "path": "apps/ml-service",
+      "runtime": "Python (WSL)",
+      "port": 8000
+    },
+    "ros2_ws": {
+      "path": "robotics/ros2_ws",
+      "runtime": "ROS 2 Humble (WSL)",
+      "display": "Wayland/X11 (WSLg)"
+    }
+  }
+}

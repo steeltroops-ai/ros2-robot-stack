@@ -1,54 +1,52 @@
 # Multi-Layer Robotics Platform
 
-A production-grade fleet management system with strict separation of concerns, simulating a real-world robotics deployment environment.
+I have designed this system as a production-grade fleet management platform. It enforces a strict separation of concerns, simulating a real-world robotics deployment environment.
 
-## 🚀 Quick Start (WSL 2 Only)
+## System Prerequisites (WSL 2 Only)
 
 **WARNING**: This project uses a hybrid workflow. ROS 2 commands **must** run in WSL 2 or Docker.
 
-### 1. Prerequisities
+### 1. Required Tooling
 
 - **WSL 2** (Ubuntu 22.04 recommended)
-- **Bun** (`curl -fsSL https://bun.sh/install | bash`)
-- **UV** (Python Manager: `curl -LsSf https://astral.sh/uv/install.sh | sh`)
+- **Bun** (Node.js Alternative)
+- **UV** (Python Package Manager)
 - **ROS 2 Humble** (Installed in WSL)
 - **Docker Desktop** (With WSL 2 backend enabled)
 
-### 2. How to Access WSL 2
+### 2. Accessing the Environment
 
-If you are on Windows:
+**From Windows:**
 
 1.  Open PowerShell.
 2.  Type `wsl` and hit Enter.
-3.  You are now in Linux. Navigate to your project (best if cloned inside `~`):
+3.  Navigate to the project directory:
     ```bash
     cd ~/projects/ros2-robot-stack
     ```
 
-### 3. Initialize & Build
+### 3. Initialization & Build Strategy
 
-We use `bun` as the universal task runner.
+We use `bun` as the universal task runner to orchestrate the build process.
 
 ```bash
-# Install all dependencies (Frontend, Backend, Shared)
+# 1. Install all dependencies (Frontend, Backend, Shared)
 bun install
 
-# Install Python deps for ML Service
+# 2. Setup Python environment for ML Service
 cd apps/ml-service
 uv venv
 source .venv/bin/activate
 uv pip install -r requirements.txt
 
-# Return to root
+# 3. Return to root and compile artifacts
 cd ../..
-
-# Build Shared Types & Apps
 bun run build:all
 ```
 
-### 4. Running the Stack
+### 4. Runtime Execution Guide
 
-Run each service in a separate terminal tab (inside WSL).
+I execute each service in a separate terminal tab (inside WSL) to simulate microservices.
 
 **Terminal 1: Infrastructure**
 
@@ -57,21 +55,21 @@ cd infra
 docker compose up -d postgres redis
 ```
 
-**Terminal 2: Backend**
+**Terminal 2: Backend (Orchestrator)**
 
 ```bash
 cd apps/backend
 bun run dev
 ```
 
-**Terminal 3: Frontend**
+**Terminal 3: Frontend (Dashboard)**
 
 ```bash
 cd apps/frontend
 bun run dev
 ```
 
-**Terminal 4: ML Service**
+**Terminal 4: ML Service (Vision)**
 
 ```bash
 cd apps/ml-service
@@ -79,7 +77,7 @@ source .venv/bin/activate
 uvicorn main:app --reload
 ```
 
-**Terminal 5: ROS 2 Simulation**
+**Terminal 5: ROS 2 Simulation (Physics)**
 
 ```bash
 cd robotics/ros2_ws
@@ -89,7 +87,7 @@ source install/setup.bash
 ros2 launch simulation_manager main.launch.py
 ```
 
-## 📂 Architecture
+## Architecture Overview
 
 | Service        | Location           | Runtime       | Purpose                   |
 | :------------- | :----------------- | :------------ | :------------------------ |
@@ -99,12 +97,15 @@ ros2 launch simulation_manager main.launch.py
 | **Robotics**   | `robotics/ros2_ws` | ROS 2 Humble  | Simulation & Control      |
 | **Shared**     | `packages/`        | TypeScript    | Source of Truth for Types |
 
-## 🔗 Connectivity Model
+## Connectivity Model
 
 All services run inside the **Same Network Namespace** (localhost) when using WSL 2.
 
-- **Frontend (3000)** -> HTTP/WS -> **Backend (4000)**
-- **Backend** -> TCP/DDS -> **ROS 2 Nodes**
-- **ML Service (8000)** -> DDS (Topics) -> **ROS 2 Nodes**
+```mermaid
+graph TD
+    A[Frontend] -->|HTTP/WS| B[Backend]
+    B -->|DDS/Native| C[ROS 2 Nodes]
+    D[ML Service] -->|DDS/Topics| C
+```
 
 This mimics a production cluster where services talk over a private mesh network.

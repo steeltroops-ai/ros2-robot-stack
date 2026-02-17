@@ -62,9 +62,3 @@ Desktop.ini
 .env.local
 
 # AI Agent (Cortex)
-.agent/
-.agent/decisions
-.agent/rules/
-.agent/workflows
-system-index.json
-docs/reports
