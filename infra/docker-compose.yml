@@ -1,0 +1,100 @@
+version: "3.8"
+
+services:
+  # -----------------------------
+  # Platform Backend (Node.js)
+  # -----------------------------
+  backend:
+    build:
+      context: ../apps/backend
+      dockerfile: Dockerfile
+    container_name: platform-backend
+    environment:
+      - ROS_DOMAIN_ID=0
+      - DB_URL=postgres://user:pass@postgres:5432/robotics
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ros-net
+
+  # -----------------------------
+  # ML Inference Service (Python)
+  # -----------------------------
+  ml-service:
+    build:
+      context: ../apps/ml-service
+      dockerfile: Dockerfile
+    container_name: ml-inference
+    environment:
+      - ROS_DOMAIN_ID=0
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../apps/ml-service:/app
+    networks:
+      - ros-net
+
+  # -----------------------------
+  # Frontend (Next.js)
+  # -----------------------------
+  frontend:
+    build:
+      context: ../apps/frontend
+      dockerfile: Dockerfile
+    container_name: platform-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+    depends_on:
+      - backend
+    networks:
+      - ros-net
+
+  # -----------------------------
+  # Robotics Simulation (Gazebo + ROS 2)
+  # -----------------------------
+  simulation:
+    build:
+      context: ../robotics/ros2_ws
+      dockerfile: Dockerfile
+    container_name: ros2-simulation
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ../robotics/ros2_ws:/ros2_ws
+    command: ros2 launch simulation_bringup world.launch.py
+    networks:
+      - ros-net
+
+  # -----------------------------
+  # Infrastructure
+  # -----------------------------
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: robotics
+    ports:
+      - "5432:5432"
+    networks:
+      - ros-net
+
+  redis:
+    image: redis:alpine
+    container_name: redis-queue
+    ports:
+      - "6379:6379"
+    networks:
+      - ros-net
+
+networks:
+  ros-net:
+    driver: bridge

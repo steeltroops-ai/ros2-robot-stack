@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment (Universal Ignores)
+.venv
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json  # We use Bun
+bun.lockb          # Optional to commit, but generally good to commit lockfiles.
+
+# ROS 2
+log/
+build/
+install/
+scenarios/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Environment Variables
+.env
+.env.local
+
+# AI Agent (Cortex)
+.agent/
+.agent/decisions
+.agent/rules/
+.agent/workflows
+system-index.json
+docs/reports
