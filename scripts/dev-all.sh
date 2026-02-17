@@ -1,41 +1,42 @@
 #!/bin/bash
 
 # Configuration
-SESSION_NAME="robot_stack"
-WSL_PROJECT_PATH="/mnt/c/Omniverse/Projects/ros2-robot-stack" # Or ~/projects/ros2-robot-stack if you moved it
+WSL_PROJECT_PATH="/root/projects/ros2-robot-stack"
+BUN_PATH="/root/.bun/bin/bun"
+ROS_SETUP="/opt/ros/humble/setup.bash"
 
 # Function to kill child processes on exit
 trap "kill 0" EXIT
 
-echo "Launching Robotics Stack..."
+echo "Launching Robotics Stack from WSL Performance Layer..."
 
 # 1. Start ROS 2 Mock Robot
-echo "[1/3] Starting ROS 2 Simulation..."
+echo "[1/3] Starting ROS 2 Simulation Node..."
 (
-    source /opt/ros/humble/setup.bash
+    source $ROS_SETUP
     cd $WSL_PROJECT_PATH/robotics/ros2_ws
-    # Build first to be safe
-    colcon build --packages-select simulation_manager
-    source install/setup.bash
-    # Run Node
+    source install/setup.bash 2>/dev/null || echo "Warning: install/setup.bash not found, running with system ROS only."
     python3 src/simulation_manager/src/mock_robot.py
 ) &
 
-# 2. Start Backend
-echo "[2/3] Starting Backend..."
+# 2. Start Backend (Requires ROS Environment for rclnodejs)
+echo "[2/3] Starting Backend Bridge..."
 (
+    source $ROS_SETUP
     cd $WSL_PROJECT_PATH/apps/backend
-    bun run dev
+    $BUN_PATH run dev
 ) &
 
 # 3. Start Frontend
-echo "[3/3] Starting Frontend..."
+echo "[3/3] Starting Frontend Dashboard..."
 (
     cd $WSL_PROJECT_PATH/apps/frontend
-    bun run dev
+    $BUN_PATH run dev
 ) &
 
-# Wait for user input to exit
-echo "✅ All systems go! Open http://localhost:3000"
-echo "Press CTRL+C to stop everything."
+echo "✅ All systems initialized."
+echo "Dashboard: http://localhost:3000"
+echo "Backend: http://localhost:4000"
+echo "Press CTRL+C to stop all services."
+
 wait
