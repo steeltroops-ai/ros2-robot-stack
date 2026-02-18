@@ -5,12 +5,15 @@ USER root
 ENV PATH="/root/.bun/bin:${PATH}"
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install core tools in one layer to reduce size
+# Install core tools and ROS 2 Navigation stack
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     python3-pip \
     unzip \
+    ros-humble-navigation2 \
+    ros-humble-nav2-bringup \
+    python3-colcon-common-extensions \
     && curl -fsSL https://bun.sh/install | bash \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 

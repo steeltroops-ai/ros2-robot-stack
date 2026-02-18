@@ -9,7 +9,9 @@
     "dev": "tsx src/index.ts",
     "build": "bun build ./src/index.ts --outdir ./dist --target node",
     "start": "bun run dist/index.js",
-    "rebuild": "node node_modules/rclnodejs/scripts/generate_messages.js"
+    "rebuild": "node node_modules/rclnodejs/scripts/generate_messages.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'No lint configured for backend'"
   },
   "devDependencies": {
     "@types/bun": "latest"

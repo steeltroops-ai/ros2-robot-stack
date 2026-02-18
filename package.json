@@ -25,7 +25,7 @@
       "bun --cwd apps/frontend run lint --fix"
     ],
     "apps/backend/**/*.{ts,tsx}": [
-      "bun --cwd apps/backend x tsc --noEmit"
+      "bun --cwd apps/backend run typecheck"
     ]
   },
   "peerDependencies": {
