@@ -3,9 +3,50 @@ name: Deploy to Hugging Face Spaces
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'docs/**'
+      - '.agent/**'
+      - 'scripts/**'
 
 jobs:
+  # Detect changes to optimize job execution
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+      robotics: ${{ steps.filter.outputs.robotics }}
+      shared: ${{ steps.filter.outputs.shared }}
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'apps/frontend/**'
+              - 'package.json'
+              - 'bun.lock'
+            backend:
+              - 'apps/backend/**'
+              - 'package.json'
+              - 'bun.lock'
+            robotics:
+              - 'robotics/ros2_ws/**'
+              - 'Dockerfile'
+              - 'hf_entrypoint.sh'
+            shared:
+              - 'packages/shared-types/**'
+            infra:
+              - '.github/workflows/**'
+
   validate:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -20,18 +61,23 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Type Check (Frontend)
+        if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.shared == 'true' }}
         working-directory: ./apps/frontend
         run: bun x tsc --noEmit
 
       - name: Lint Check (Frontend)
+        if: ${{ needs.changes.outputs.frontend == 'true' }}
         working-directory: ./apps/frontend
         run: bun run lint
 
       - name: Type Check (Backend)
+        if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' }}
         working-directory: ./apps/backend
         run: bun run typecheck
 
   ros-validate:
+    needs: changes
+    if: ${{ needs.changes.outputs.robotics == 'true' }}
     runs-on: ubuntu-latest
     container:
       image: ros:humble-ros-base
@@ -59,7 +105,12 @@ jobs:
           /bin/bash -c "source /opt/ros/humble/setup.bash && colcon test-result --summary"
 
   deploy-backend:
-    needs: [validate, ros-validate]
+    needs: [changes, validate, ros-validate]
+    if: |
+      always() &&
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.robotics == 'true' || needs.changes.outputs.shared == 'true') &&
+      (needs.validate.result == 'success' || needs.validate.result == 'skipped') &&
+      (needs.ros-validate.result == 'success' || needs.ros-validate.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -76,7 +127,6 @@ jobs:
           rm -rf apps/frontend
           
           # Update package.json to remove frontend workspace
-          # We use python3 for a quick inline JSON edit
           python3 -c '
           import json
           with open("package.json", "r+") as f:
@@ -103,7 +153,11 @@ jobs:
           git push --force hf hf-deploy:main
 
   deploy-frontend:
-    needs: [validate, ros-validate]
+    needs: [changes, validate]
+    if: |
+      always() &&
+      (needs.changes.outputs.frontend == 'true' || needs.changes.outputs.shared == 'true') &&
+      (needs.validate.result == 'success' || needs.validate.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
