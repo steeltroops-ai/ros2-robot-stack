@@ -34,7 +34,8 @@ COPY packages/ ./packages/
 RUN find . -maxdepth 4 -type f -not -name 'package.json' -not -name 'bun.lock' -not -name 'Dockerfile' -delete || true
 
 # Use BUN for ultra-fast multi-workspace installation
-RUN bun install --frozen-lockfile
+# Note: we don't use --frozen-lockfile because we dynamically prune package.json
+RUN bun install
 
 # --- STAGE 3: BUILD ---
 # Now copy the rest of the source
@@ -46,7 +47,8 @@ RUN bun run build
 
 # Prepare Backend (Fix port for HF Spaces)
 WORKDIR /app/apps/backend
-RUN sed -i 's/port: 4000/port: 7860/g' src/index.ts
+# Only run sed if the file exists and has the pattern
+RUN if [ -f src/index.ts ]; then sed -i 's/port: 4000/port: 7860/g' src/index.ts; fi
 
 # Build ROS 2 Workspaces
 WORKDIR /app/robotics/ros2_ws

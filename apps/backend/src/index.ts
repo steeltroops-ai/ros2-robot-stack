@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 
 
 const fastify = Fastify({
-  logger: true,
+  logger: { level: "warn" },
 });
 
 const io = new Server(fastify.server, {
