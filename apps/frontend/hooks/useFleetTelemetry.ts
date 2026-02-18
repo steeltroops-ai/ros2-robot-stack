@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { socket } from "@/utils/socket";
 
-// Shared type (Should be in shared-types in production)
 export interface RobotState {
   id: string;
   x: number;
@@ -12,10 +11,33 @@ export interface RobotState {
   lastSeen: number;
 }
 
+interface TelemetryData {
+  id: string;
+  x: number;
+  y: number;
+  theta: number;
+  battery: number;
+}
+
+export interface MapData {
+  info: {
+    resolution: number;
+    width: number;
+    height: number;
+    origin?: {
+      position: {
+        x: number;
+        y: number;
+      };
+    };
+  };
+  data: number[];
+}
+
 export function useFleetTelemetry() {
   const [robots, setRobots] = useState<Map<string, RobotState>>(new Map());
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [mapData, setMapData] = useState<any>(null);
+  const [mapData, setMapData] = useState<MapData | null>(null);
   const [pathData, setPathData] = useState<{ x: number; y: number }[]>([]);
 
   useEffect(() => {
@@ -31,7 +53,7 @@ export function useFleetTelemetry() {
       setIsConnected(false);
     }
 
-    function onTelemetry(data: any) {
+    function onTelemetry(data: TelemetryData) {
       setRobots((prev) => {
         const next = new Map(prev);
         const existing = next.get(data.id) || { ...data, status: "ONLINE", lastSeen: 0 };
@@ -40,16 +62,16 @@ export function useFleetTelemetry() {
           ...data,
           status: "ONLINE",
           lastSeen: Date.now(),
-        });
+        } as RobotState);
         return next;
       });
     }
 
-    function onMap(data: any) {
+    function onMap(data: MapData) {
         setMapData(data);
     }
 
-    function onPlan(data: any) {
+    function onPlan(data: { x: number; y: number }[]) {
         setPathData(data);
     }
 

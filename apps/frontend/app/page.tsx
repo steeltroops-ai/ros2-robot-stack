@@ -92,12 +92,14 @@ function BatteryIndicator({ level }: { level: number }) {
   );
 }
 
-export default function Home() {
+// --- 1. Dashboard Logic (Extracted for Suspense) ---
+function FleetDashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const { robots, isConnected, sendControl, mapData, subscribeToRobot, unsubscribeFromRobot } = useFleetTelemetry();
   const [mounted, setMounted] = useState(false);
+  
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -200,7 +202,7 @@ export default function Home() {
         className="flex flex-col gap-6 p-6"
         style={{ height: "100%", minHeight: 0 }}
       >
-        {/* Metric Cards - RESTORED */}
+        {/* Metric Cards */}
         <div
           className="grid flex-shrink-0"
           style={{
@@ -345,5 +347,23 @@ export default function Home() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+// --- 2. Exports Header & Wrapper ---
+import { Suspense } from "react";
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+       <div className="w-screen h-screen bg-white flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+             <div className="w-12 h-12 rounded-full border-4 border-zinc-100 border-t-black animate-spin" />
+             <span className="text-xs font-black uppercase tracking-widest text-zinc-400">Loading Omniverse</span>
+          </div>
+       </div>
+    }>
+       <FleetDashboard />
+    </Suspense>
   );
 }

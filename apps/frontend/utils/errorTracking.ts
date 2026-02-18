@@ -2,7 +2,7 @@ type LogEntry = {
   timestamp: string;
   type: "log" | "warn" | "error" | "exception";
   message: string;
-  context?: any;
+  context?: unknown;
 };
 
 class ErrorTracker {
@@ -20,23 +20,23 @@ class ErrorTracker {
     const originalWarn = console.warn;
     const originalError = console.error;
 
-    console.log = (...args: any[]) => {
+    console.log = (...args: unknown[]) => {
       this.addLog("log", args);
       originalLog.apply(console, args);
     };
 
-    console.warn = (...args: any[]) => {
+    console.warn = (...args: unknown[]) => {
       this.addLog("warn", args);
       originalWarn.apply(console, args);
     };
 
-    console.error = (...args: any[]) => {
+    console.error = (...args: unknown[]) => {
       this.addLog("error", args);
       originalError.apply(console, args);
     };
   }
 
-  private addLog(type: LogEntry["type"], args: any[]) {
+  private addLog(type: LogEntry["type"], args: unknown[]) {
     const message = args
       .map((arg) => {
         if (typeof arg === "string") return arg;
@@ -59,7 +59,7 @@ class ErrorTracker {
     }
   }
 
-  captureException(error: Error, context: any = {}) {
+  captureException(error: Error, context: unknown = {}) {
     this.logs.push({
       timestamp: new Date().toISOString(),
       type: "exception",

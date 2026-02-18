@@ -2,9 +2,11 @@
 
 import { useEffect, useRef } from "react";
 
+import { MapData, RobotState } from "@/hooks/useFleetTelemetry";
+
 interface MapDisplayProps {
-  mapData: any;
-  robots: any[];
+  mapData: MapData | null;
+  robots: RobotState[];
   onSelectRobot?: (id: string | null) => void;
   selectedId?: string | null;
 }
@@ -29,8 +31,8 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
     let found = null;
 
     robots.forEach((robot) => {
-      const originX = mapData.info.origin.position.x;
-      const originY = mapData.info.origin.position.y;
+      const originX = mapData.info.origin?.position.x || 0;
+      const originY = mapData.info.origin?.position.y || 0;
       const resolution = mapData.info.resolution;
       
       const rx = (robot.x - originX) / resolution;
@@ -88,8 +90,8 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
 
     // Draw robots
     robots.forEach((robot) => {
-      const originX = mapData.info.origin.position.x;
-      const originY = mapData.info.origin.position.y;
+      const originX = mapData.info.origin?.position.x || 0;
+      const originY = mapData.info.origin?.position.y || 0;
 
       const px = (robot.x - originX) / resolution;
       const py = (robot.y - originY) / resolution;

@@ -16,16 +16,16 @@
   },
   "scripts": {
     "validate": "bun run typecheck && bun run lint",
-    "typecheck": "bun x --cwd apps/frontend tsc --noEmit && bun x --cwd apps/backend tsc --noEmit",
-    "lint": "bun x --cwd apps/frontend next lint",
+    "typecheck": "cd apps/frontend && bun x tsc --noEmit && cd ../backend && bun x tsc --noEmit",
+    "lint": "cd apps/frontend && bun run lint",
     "prepare": "husky"
   },
   "lint-staged": {
     "apps/frontend/**/*.{ts,tsx}": [
-      "bun x --cwd apps/frontend next lint --fix"
+      "bun --cwd apps/frontend run lint --fix"
     ],
-    "apps/**/*.{ts,tsx}": [
-      "bun run typecheck"
+    "apps/backend/**/*.{ts,tsx}": [
+      "bun --cwd apps/backend x tsc --noEmit"
     ]
   },
   "peerDependencies": {

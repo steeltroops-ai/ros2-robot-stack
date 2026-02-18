@@ -20,24 +20,22 @@ import { DestinationMarker } from "./assets/DestinationMarker";
 import { PathLine } from "./assets/PathLine";
 import { useFleetTelemetry } from "@/hooks/useFleetTelemetry";
 
+import { ThreeEvent } from "@react-three/fiber";
+import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+
 function SceneContent({ pose, robotId }: { pose: { x: number; y: number; theta: number }, robotId: string }) {
   const robotRef = useRef<THREE.Group>(null!);
-  const controlsRef = useRef<any>(null!);
+  const controlsRef = useRef<OrbitControlsImpl>(null!);
   const { sendNavigationGoal, pathData } = useFleetTelemetry();
   
   // Navigation State
   const [goal, setGoal] = useState<{ x: number; y: number } | null>(null);
 
-  // Refs for smooth interpolation
   // Navigation Goal Handler
-  const handleFloorClick = (e: any) => {
-    // Only handle if it's the right click or some modifier? 
-    // Let's just do standard click for now.
+  const handleFloorClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
     const { x, z } = e.point;
     
-    // Convert Three.js (x, z) to ROS 2 (x, y)
-    // Three.z = -ROS.y => ROS.y = -Three.z
     const rosX = x;
     const rosY = -z;
     

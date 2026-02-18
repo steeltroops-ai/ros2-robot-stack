@@ -105,10 +105,12 @@ export function CyberAmr({ stateRef }: CyberAmrProps) {
     const time = state.clock.getElapsedTime();
     ringMat.emissiveIntensity = 1.5 + Math.sin(time * 3) * 0.5;
     
-    let targetColor = new THREE.Color(THEME.success);
-    if (currentStatus === "moving") targetColor.set(THEME.accent);
-    if (currentStatus === "error") targetColor.set(THEME.danger);
-    if (currentStatus === "offline") targetColor.set("#71717a");
+    const targetColor = new THREE.Color(
+      currentStatus === "moving" ? THEME.accent :
+      currentStatus === "error" ? THEME.danger :
+      currentStatus === "offline" ? "#71717a" :
+      THEME.success
+    );
     
     ringMat.color.lerp(targetColor, 0.1);
     ringMat.emissive.lerp(targetColor, 0.1);

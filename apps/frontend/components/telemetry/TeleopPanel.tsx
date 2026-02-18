@@ -5,7 +5,6 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowRight,
-  CircleStop,
 } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 
