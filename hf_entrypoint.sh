@@ -8,6 +8,22 @@ set -e
 
 echo "--- [SYSTEM] ROS 2 Humble Environment Sourced ---"
 
+# --- CLOUD CONTAINER OPTIMIZATIONS ---
+# 1. Network Isolation: Force all ROS traffic to localhost (Bypasses HF network restrictions)
+export ROS_LOCALHOST_ONLY=1
+export ROS_DOMAIN_ID=42
+
+# 2. DDS Middleware: Use FastDDS (Default but explicit is better)
+export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+
+# 3. Headless Mode: Prevent any accidental GUI attempts
+export QT_QPA_PLATFORM=offscreen
+
+# Debug: Print Memory Info to log
+echo "--- [SYSTEM] Memory Available: ---"
+free -h
+echo "----------------------------------"
+
 # 2. Start the Mock Robot Simulation
 echo "--- [DEPLOY] Starting Mock Robot Simulation (robot_1) ---"
 ros2 run simulation_manager mock_robot --ros-args -p robot_id:=robot_1 &
