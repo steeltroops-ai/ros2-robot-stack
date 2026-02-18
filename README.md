@@ -1,3 +1,12 @@
+---
+title: Omniverse - ROS2 Robot Stack
+emoji: 🤖
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # Multi-robot fleet management platform.**
 
 Simulate real hardware robots through ROS 2. Control them through a web-based 3D dashboard. Add AI perception for intelligent autonomy.
@@ -158,12 +167,4 @@ ros2-robot-stack/
 ## License
 
 **PROPRIETARY / SOURCE AVAILABLE**
-
-This is **Private Property** of Mayank (steeltroops.ai).
-
-- **Personal Use**: Free for learning, research, and contribution.
-- **Commercial Use**: **Requires Partnership Agreement**.
-  - To use this software for profit, selling, or business operations, you must obtain a commercial license.
-  - Contact: **steeltroops.ai@gmail.com** for partnership inquiries.
-
 See [LICENSE](LICENSE) for full terms.
