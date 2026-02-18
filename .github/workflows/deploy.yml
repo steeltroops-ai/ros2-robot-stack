@@ -126,11 +126,15 @@ jobs:
           # 1. Prune 'apps' to keep only backend
           if [ -d "apps" ]; then
             find apps -mindepth 1 -maxdepth 1 ! -name 'backend' -exec rm -rf {} +
+          else
+            mkdir apps
           fi
           
           # 2. Prune 'packages' to keep only shared-types
           if [ -d "packages" ]; then
             find packages -mindepth 1 -maxdepth 1 ! -name 'shared-types' -exec rm -rf {} +
+          else
+            mkdir packages
           fi
           
           # 3. Prune root level directories except the essentials

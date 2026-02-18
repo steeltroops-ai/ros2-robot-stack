@@ -29,9 +29,9 @@ COPY package.json bun.lock ./
 COPY apps/ ./apps/
 COPY packages/ ./packages/
 
-# Filter out the source code but keep package.jsons for caching
-# (This is a trick to maximize caching while being monorepo friendly)
-RUN find apps packages -type f ! -name 'package.json' -delete
+# Filter out the source code but keep package.jsons and lockfiles for caching
+# This maximizes caching while being monorepo friendly
+RUN find . -maxdepth 4 -type f -not -name 'package.json' -not -name 'bun.lock' -not -name 'Dockerfile' -delete || true
 
 # Use BUN for ultra-fast multi-workspace installation
 RUN bun install --frozen-lockfile
