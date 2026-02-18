@@ -67,13 +67,40 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Prune for Backend
+        run: |
+          # Create a temporary branch for a clean HF push
+          git checkout -b hf-deploy
+          
+          # Remove frontend (The user doesn't want it on HF)
+          rm -rf apps/frontend
+          
+          # Update package.json to remove frontend workspace
+          # We use python3 for a quick inline JSON edit
+          python3 -c '
+          import json
+          with open("package.json", "r+") as f:
+              data = json.load(f)
+              data["workspaces"] = [w for w in data["workspaces"] if "frontend" not in w]
+              f.seek(0)
+              json.dump(data, f, indent=2)
+              f.truncate()
+          '
+          
+          # Commit the pruned state
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "chore(deploy): prune frontend for HF push"
+
       - name: Build and Push to HF
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_SPACE: ${{ secrets.HF_SPACE }}
         run: |
           git remote add hf https://root:$HF_TOKEN@huggingface.co/spaces/$HF_SPACE || git remote set-url hf https://root:$HF_TOKEN@huggingface.co/spaces/$HF_SPACE
-          git push --force hf main
+          # Push the pruned branch to HF main
+          git push --force hf hf-deploy:main
 
   deploy-frontend:
     needs: [validate, ros-validate]

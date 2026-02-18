@@ -21,4 +21,4 @@ ros2 launch amr_navigation amr_nav.launch.py use_sim_time:=False &
 echo "--- [DEPLOY] Starting Bun-Native Telemetry Gateway (Port: 7860) ---"
 cd /app/apps/backend
 # Ensure we are using the Production entrypoint
-exec bun run dev
+exec bun run start

@@ -6,9 +6,9 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "dev": "tsx src/index.ts",
+    "dev": "bun --watch src/index.ts",
     "build": "bun build ./src/index.ts --outdir ./dist --target node",
-    "start": "bun run dist/index.js",
+    "start": "bun src/index.ts",
     "rebuild": "node node_modules/rclnodejs/scripts/generate_messages.js",
     "typecheck": "tsc --noEmit",
     "lint": "echo 'No lint configured for backend'"

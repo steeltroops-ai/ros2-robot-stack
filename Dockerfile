@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     ros-humble-navigation2 \
     ros-humble-nav2-bringup \
+    ros-humble-nav2-behavior-tree-plugins \
+    ros-humble-nav2-controller \
+    ros-humble-nav2-planner \
     python3-colcon-common-extensions \
     && curl -fsSL https://bun.sh/install | bash \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -43,7 +46,7 @@ RUN sed -i 's/port: 4000/port: 7860/g' src/index.ts
 
 # Build ROS 2 Workspaces
 WORKDIR /app/robotics/ros2_ws
-RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-install --packages-select simulation_manager amr_navigation"
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-select simulation_manager amr_navigation"
 
 # --- STAGE 4: RUNTIME ---
 WORKDIR /app

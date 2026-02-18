@@ -1,0 +1,20 @@
+# Exclude frontend source from backend build image
+apps/frontend
+# Exclude build artifacts
+**/node_modules
+**/dist
+**/.next
+**/build
+**/install
+**/log
+# Exclude git
+.git
+.github
+.husky
+# Exclude docs
+docs
+# Exclude scripts
+scripts
+# Exclude other junk
+*.log
+.DS_Store
