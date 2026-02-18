@@ -1,10 +1,12 @@
 {
   "name": "backend",
+  "author": "Mayank <steeltroops.ai@gmail.com>",
   "module": "index.ts",
   "type": "module",
+  "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "dev": "bun run src/index.ts",
+    "dev": "tsx src/index.ts",
     "build": "bun build ./src/index.ts --outdir ./dist --target node",
     "start": "bun run dist/index.js",
     "rebuild": "node node_modules/rclnodejs/scripts/generate_messages.js"

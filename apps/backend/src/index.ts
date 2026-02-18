@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import { Server } from "socket.io";
-import socketio from "socket.io";
+
 
 const fastify = Fastify({
   logger: true,
@@ -16,6 +16,11 @@ const io = new Server(fastify.server, {
 // Load Modules
 import { TelemetryGateway } from "./modules/telemetry/telemetry.gateway";
 const telemetry = new TelemetryGateway(io);
+
+// Expose API for debugging
+fastify.get("/api/robots", async (request, reply) => {
+  return telemetry.getRobots();
+});
 
 // Start
 const start = async () => {

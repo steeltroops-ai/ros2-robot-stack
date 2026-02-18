@@ -1,8 +1,14 @@
 {
   "name": "ros2-robot-stack",
+  "author": "Mayank <steeltroops.ai@gmail.com>",
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "license": "UNLICENSED",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "devDependencies": {
     "@types/bun": "latest"
   },

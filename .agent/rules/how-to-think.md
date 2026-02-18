@@ -8,10 +8,11 @@ trigger: always_on
 
 Before writing any code, the agent must ask:
 
-1. Is this per-pixel? → GPU
-1. Is this high-precision math? → Rust
-1. Is this orchestration? → TypeScript
-1. Is this UI? → React
+1. Is this per-pixel / per-vertex? → GPU / Three.js shader
+2. Is this control logic (100Hz)? → ROS 2 C++ / Python node
+3. Is this orchestration/routing? → TypeScript (Node.js Backend)
+4. Is this visualization? → React / React Three Fiber
+5. Is this ML inference? → Python (FastAPI + PyTorch)
 
 No cross-layer leakage. If it violates this, it must justify it.
 
@@ -20,79 +21,81 @@ No cross-layer leakage. If it violates this, it must justify it.
 Every feature must be evaluated as:
 
 1. How many ms does this cost?
-1. Is this inside the hot path?
-1. Is this inside the integration loop?
-1. Does this increase average ray steps?
+2. Is this inside the control loop (10ms budget)?
+3. Is this inside the render loop (16ms budget at 60fps)?
+4. Does this increase WebSocket message size?
 
 If the answer increases frame cost without measurable gain, reject it.
 
-## 3. Think in Curvature, Not Distance
+## 3. Think in Coordinate Systems
 
-For physics decisions:
+Three coordinate systems in play:
 
-1. Adaptive step must scale with curvature (M / r³).
-1. Horizon region gets precision.
-1. Far region gets speed.
-1. Not arbitrary distance scaling.
+| System     | X       | Y       | Z       |
+| :--------- | :------ | :------ | :------ |
+| ROS 2 ENU  | Forward | Left    | Up      |
+| Three.js   | Right   | Up      | Camera  |
+| OccGrid    | Column  | Row     | N/A     |
+
+Conversions MUST be explicit and documented.
 
 ## 4. Think Determinism First
 
 Agent must ask:
 
 1. Is this deterministic?
-1. Does this break reproducibility?
-1. Does this affect energy conservation?
+2. Does this break reproducibility?
+3. Does this affect robot safety?
 
-Debug mode must always be stable.
+Debug mode must always produce identical results.
 
 ## 5. Think Profiling Before Optimizing
 
 Before optimizing:
 
-1. Identify CPU time.
-1. Identify GPU time.
-1. Identify memory bandwidth usage.
+1. Identify CPU time (Node.js event loop, ROS callbacks).
+2. Identify GPU time (Three.js draw calls, shader complexity).
+3. Identify network bandwidth (message size * frequency).
 
 No speculative optimization allowed.
 
-## 6. Think Branch Divergence
+## 6. Think in 3D Performance
 
-Inside shader:
+Inside R3F / Three.js:
 
-1. Will this branch cause warp divergence?
-1. Can this be written branchless?
-1. Can this be masked instead of conditionally broken?
-
-GPU reasoning must be explicit.
+1. Creating geometry every frame? → P0 VIOLATION
+2. Using useState for 60Hz data? → P0 VIOLATION (use useRef)
+3. Causing React re-renders for pose updates? → P0 VIOLATION
+4. Can identical robots use InstancedMesh? → USE IT
 
 ## 7. Think in Invariants
 
 Agent must hoist invariants:
 
-1. Precompute outside loop.
-1. Precompute outside frame.
-1. Precompute outside shader if possible.
+1. Precompute outside render loop.
+2. Precompute outside frame callback.
+3. Cache glTF models on first load.
 
 Never recompute constants inside hot loops.
 
-## 8. Think in Numerical Stability
+## 8. Think in Robot Safety
 
-For integrators:
+For any command sent to a robot:
 
-1. What is local truncation error?
-1. Is method symplectic?
-1. Does adaptive dt maintain stability?
-1. Does f32 precision drift accumulate?
+1. Is the velocity within safe limits?
+2. Is there a timeout/deadman switch?
+3. What happens if the WebSocket disconnects mid-command?
+4. Does the robot have a local safety controller?
 
-No “looks correct” acceptance.
+Safety is non-negotiable.
 
 ## 9. Think in Minimal Surface API
 
-Rust ↔ TS boundary must stay small. Agent must resist:
+Backend ↔ Frontend boundary must stay small. Agent must resist:
 
-1. Exporting large structs.
-1. Streaming big buffers.
-1. Adding unnecessary bridge functions.
+1. Sending raw ROS messages to frontend (transform to clean DTOs).
+2. Streaming unnecessary fields (send only what the UI needs).
+3. Adding bridge functions without a clear consumer.
 
 Minimal interface is mandatory.
 
@@ -100,56 +103,59 @@ Minimal interface is mandatory.
 
 Ask:
 
-1. Does this state change at 60Hz? → Ref / Texture / SharedArrayBuffer
-1. Does this state change on user interaction? → React State / Zustand
-1. Does this state change on app load? → Constant / Config
+1. Does this state change at 60Hz? → Ref / useFrame / SharedArrayBuffer
+2. Does this state change on user interaction? → React State / Zustand
+3. Does this state change on app load? → Constant / Config
+4. Does this state change per robot? → Namespace it
 
 Never mix 60Hz state with React Reconciliation.
 
-## 11. Think in Resource Lifecycles (WebGPU)
+## 11. Think in Resource Lifecycles (3D)
 
 Setup Phase (One-time):
-
-- Create Buffers
-- Compile Pipelines
-- Create BindGroups
+- Load glTF models
+- Create materials and textures
+- Initialize WebSocket connection
 
 Loop Phase (Per-frame):
+- Update pose refs
+- Apply transforms in useFrame
+- DO NOT create new objects
 
-- Write Buffers (only deltas)
-- Encode Passes
-- Submit WorkReference
+Creating a resource inside useFrame is a P0 violation.
 
-Creating a resource inside the loop is a P0 violation.
+## 12. Think in Vertical Completeness
 
-## 12. Think in Research Credibility
+For every feature, ALL layers must exist:
 
-If claiming Kerr:
+1. **Type** in shared-types
+2. **ROS** topic/action defined
+3. **Backend** bridge implemented
+4. **Frontend** component rendering
+5. **3D** scene updated if spatial
 
-1. Is it actually Kerr?
-1. Or pseudo-Newtonian with hacks?
-1. Agent must label approximations explicitly.
+A feature missing ANY layer is NOT DONE.
 
 ## 13. Core Execution Directives
 
 The agent must always:
 
-1. Prioritize physics correctness.
-1. Prioritize GPU execution for parallel workloads.
-1. Never move per-pixel logic to CPU.
-1. Always profile before optimizing.
-1. Document approximations.
-1. Maintain deterministic debug mode.
-1. Design for future WebGPU migration.
-1. Avoid abstractions that hide cost.
-1. Avoid unnecessary streaming between layers.
+1. Prioritize robot safety.
+2. Prioritize real-time performance.
+3. Never put control logic in the frontend.
+4. Always profile before optimizing.
+5. Document coordinate transformations.
+6. Maintain deterministic debug mode.
+7. Design for N robots, not 1.
+8. Avoid abstractions that hide cost.
+9. Avoid unnecessary streaming between layers.
+10. Keep the URDF → glTF pipeline offline.
 
 ## 14. Think in Verification (Research Protocol)
 
-For complex tasks (Simulations, ML, Data Generation), you MUST adhere to the **Research Team Protocol** (`.agent/rules/research-team-protocol.md`).
+For complex tasks (Simulations, ML, IK Solvers):
 
-1.  **Trigger Quest First**: Do not execute blindly. Determine *expected* output.
-2.  **Verify Assumptions**: Check units, ranges, and patterns on small samples.
-3.  **Act as Expert**: If data looks wrong, STOP. Fix the process.
-4.  **No Hallucination**: Verify inputs and outputs explicitly.
-
+1. **Trigger Quest First**: Determine *expected* output.
+2. **Verify Assumptions**: Check units, ranges, coordinate frames.
+3. **Act as Expert**: If data looks wrong, STOP. Fix the process.
+4. **No Hallucination**: Verify inputs and outputs explicitly.

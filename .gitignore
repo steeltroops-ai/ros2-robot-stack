@@ -62,3 +62,5 @@ Desktop.ini
 .env.local
 
 # AI Agent (Cortex)
+.agent/
+docs/
