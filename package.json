@@ -15,9 +15,10 @@
     "lint-staged": "^15.2.2"
   },
   "scripts": {
-    "validate": "bun run typecheck && bun run lint",
-    "typecheck": "cd apps/frontend && bun x tsc --noEmit && cd ../backend && bun x tsc --noEmit",
+    "validate": "bun run typecheck && bun run lint && bun run ros-check",
+    "typecheck": "cd apps/frontend && bun x tsc --noEmit && cd ../backend && bun run typecheck",
     "lint": "cd apps/frontend && bun run lint",
+    "ros-check": "bash -c 'source /opt/ros/humble/setup.bash && cd robotics/ros2_ws && colcon build --symlink-install --packages-select simulation_manager amr_navigation && colcon test --packages-select simulation_manager amr_navigation && colcon test-result'",
     "prepare": "husky"
   },
   "lint-staged": {

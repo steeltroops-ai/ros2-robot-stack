@@ -27,13 +27,39 @@ jobs:
         working-directory: ./apps/frontend
         run: bun run lint
 
-      # Backend uses bun build which is fast, but we can do a dry-run or specific tsc check
       - name: Type Check (Backend)
         working-directory: ./apps/backend
-        run: bun x tsc --noEmit
+        run: bun run typecheck
+
+  ros-validate:
+    runs-on: ubuntu-latest
+    container:
+      image: ros:humble-ros-base
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          apt-get update && apt-get install -y \
+            python3-colcon-common-extensions \
+            python3-pip \
+            ros-humble-navigation2 \
+            ros-humble-nav2-bringup
+          
+      - name: Build ROS 2 Workspace
+        working-directory: ./robotics/ros2_ws
+        run: |
+          /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-install"
+
+      - name: Test ROS 2 Workspace
+        working-directory: ./robotics/ros2_ws
+        run: |
+          /bin/bash -c "source /opt/ros/humble/setup.bash && colcon test --event-handlers console_direct+ --packages-select simulation_manager amr_navigation"
+          /bin/bash -c "source /opt/ros/humble/setup.bash && colcon test-result --summary"
 
   deploy-backend:
-    needs: [validate]
+    needs: [validate, ros-validate]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -50,7 +76,7 @@ jobs:
           git push --force hf main
 
   deploy-frontend:
-    needs: [validate]
+    needs: [validate, ros-validate]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
