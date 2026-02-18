@@ -1,51 +1,57 @@
-# --- 1. ROS 2 HUMBLE BASE ---
+# --- STAGE 1: SYSTEM SETUP ---
 FROM ros:humble-ros-base
 
-# Change to root to install dependencies
 USER root
+ENV PATH="/root/.bun/bin:${PATH}"
+ENV DEBIAN_FRONTEND=noninteractive
 
-# --- 2. INSTALL SYSTEM DEPENDENCIES ---
-# Install Node.js, Bun, and other necessary tools
+# Install core tools in one layer to reduce size
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     python3-pip \
     unzip \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
     && curl -fsSL https://bun.sh/install | bash \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Add Bun to PATH
-ENV PATH="/root/.bun/bin:${PATH}"
-
-# --- 3. WORKSPACE SETUP ---
 WORKDIR /app
 
-# Copy the entire monorepo
+# --- STAGE 2: DEPENDENCY CACHING ---
+# Copy ONLY lockfiles and package.json to cache the "bun install" layer
+COPY package.json bun.lock ./
+COPY apps/backend/package.json ./apps/backend/
+COPY apps/frontend/package.json ./apps/frontend/
+COPY packages/shared-types/package.json ./packages/shared-types/
+
+# Use BUN for ultra-fast multi-workspace installation
+RUN bun install --frozen-lockfile
+
+# --- STAGE 3: BUILD ---
+# Now copy the rest of the source
 COPY . .
 
-# --- 4. BUILD SHARED PACKAGES ---
+# Build Shared Packages using Bun
 WORKDIR /app/packages/shared-types
-RUN npm install && npm run build
+RUN bun run build
 
-# --- 5. BUILD BACKEND ---
+# Prepare Backend (Fix port for HF Spaces)
 WORKDIR /app/apps/backend
-RUN npm install
-# Fastify needs to listen on port 7860 for Hugging Face Spaces
 RUN sed -i 's/port: 4000/port: 7860/g' src/index.ts
 
-# --- 6. BUILD ROS 2 WORKSPACE ---
+# Build ROS 2 Workspaces
 WORKDIR /app/robotics/ros2_ws
-RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --packages-select simulation_manager amr_navigation"
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-install --packages-select simulation_manager amr_navigation"
 
-# --- 7. FINAL ENTRYPOINT SCRIPT ---
+# --- STAGE 4: RUNTIME ---
 WORKDIR /app
 COPY hf_entrypoint.sh .
 RUN chmod +x hf_entrypoint.sh
 
-# Hugging Face Spaces Port
+# Expose HF Spaces default port
 EXPOSE 7860
 
-# Run the entrypoint
+# Healthcheck to help HF monitor the space
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:7860/api/robots || exit 1
+
 CMD ["./hf_entrypoint.sh"]
