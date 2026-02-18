@@ -25,9 +25,10 @@ fastify.get("/api/robots", async (request, reply) => {
 // Start
 const start = async () => {
   try {
+    const port = parseInt(process.env.PORT || "4000");
     await telemetry.init(); // Initialize ROS 2
-    await fastify.listen({ port: 4000, host: "0.0.0.0" });
-    console.log("[Backend] System Active on Port 4000");
+    await fastify.listen({ port, host: "0.0.0.0" });
+    console.log(`[Backend] System Active on Port ${port}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

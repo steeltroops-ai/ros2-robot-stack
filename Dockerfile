@@ -13,9 +13,10 @@ RUN apt-get update && apt-get install -y \
     unzip \
     ros-humble-navigation2 \
     ros-humble-nav2-bringup \
-    ros-humble-nav2-behavior-tree-plugins \
+
     ros-humble-nav2-controller \
     ros-humble-nav2-planner \
+    ros-humble-nav2-lifecycle-manager \
     python3-colcon-common-extensions \
     && curl -fsSL https://bun.sh/install | bash \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -34,8 +35,8 @@ COPY packages/ ./packages/
 RUN find . -maxdepth 4 -type f -not -name 'package.json' -not -name 'bun.lock' -not -name 'Dockerfile' -delete || true
 
 # Use BUN for ultra-fast multi-workspace installation
-# Note: we don't use --frozen-lockfile because we dynamically prune package.json
-RUN bun install
+# We source ROS setup to ensure rclnodejs builds against the installed ROS libraries
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && bun install"
 
 # --- STAGE 3: BUILD ---
 # Now copy the rest of the source
@@ -47,8 +48,7 @@ RUN bun run build
 
 # Prepare Backend (Fix port for HF Spaces)
 WORKDIR /app/apps/backend
-# Only run sed if the file exists and has the pattern
-RUN if [ -f src/index.ts ]; then sed -i 's/port: 4000/port: 7860/g' src/index.ts; fi
+ENV PORT=7860
 
 # Build ROS 2 Workspaces
 WORKDIR /app/robotics/ros2_ws
