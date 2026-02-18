@@ -5,7 +5,35 @@ on:
     branches: [ main ]
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies (Monorepo)
+        run: bun install --frozen-lockfile
+
+      - name: Type Check (Frontend)
+        working-directory: ./apps/frontend
+        run: bun x tsc --noEmit
+
+      - name: Lint Check (Frontend)
+        working-directory: ./apps/frontend
+        run: bun run lint
+
+      # Backend uses bun build which is fast, but we can do a dry-run or specific tsc check
+      - name: Type Check (Backend)
+        working-directory: ./apps/backend
+        run: bun x tsc --noEmit
+
   deploy-backend:
+    needs: [validate]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -22,6 +50,7 @@ jobs:
           git push --force hf main
 
   deploy-frontend:
+    needs: [validate]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

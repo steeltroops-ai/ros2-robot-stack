@@ -10,7 +10,23 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2"
+  },
+  "scripts": {
+    "validate": "bun run typecheck && bun run lint",
+    "typecheck": "bun x --cwd apps/frontend tsc --noEmit && bun x --cwd apps/backend tsc --noEmit",
+    "lint": "bun x --cwd apps/frontend next lint",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "apps/frontend/**/*.{ts,tsx}": [
+      "bun x --cwd apps/frontend next lint --fix"
+    ],
+    "apps/**/*.{ts,tsx}": [
+      "bun run typecheck"
+    ]
   },
   "peerDependencies": {
     "typescript": "^5"
