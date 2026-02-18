@@ -23,11 +23,15 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # --- STAGE 2: DEPENDENCY CACHING ---
-# Copy ONLY lockfiles and package.json to cache the "bun install" layer
+# Copy ONLY the package configuration to cache the install layer
 COPY package.json bun.lock ./
-COPY apps/backend/package.json ./apps/backend/
-COPY apps/frontend/package.json* ./apps/frontend/
-COPY packages/shared-types/package.json ./packages/shared-types/
+# Copy whatever workspaces exist (resilient to pruning)
+COPY apps/ ./apps/
+COPY packages/ ./packages/
+
+# Filter out the source code but keep package.jsons for caching
+# (This is a trick to maximize caching while being monorepo friendly)
+RUN find apps packages -type f ! -name 'package.json' -delete
 
 # Use BUN for ultra-fast multi-workspace installation
 RUN bun install --frozen-lockfile

@@ -63,7 +63,7 @@ export class TelemetryGateway {
       });
 
       socket.on("unsubscribe", (room: string) => {
-        console.log(`[Telemetry] Client ${socket.id} left ${room}`);
+        // console.log(`[Telemetry] Client ${socket.id} left ${room}`);
         socket.leave(room);
       });
 
@@ -117,7 +117,7 @@ export class TelemetryGateway {
         }
     };
     
-    console.log(`[Navigation] Sending goal to ${data.robotId}: [${data.x}, ${data.y}]`);
+    // console.log(`[Navigation] Sending goal to ${data.robotId}: [${data.x}, ${data.y}]`);
     pub.publish(msg);
   }
 
@@ -147,7 +147,7 @@ export class TelemetryGateway {
     };
 
     // console.log(`[Control] Publishing to ${data.robotId}: v=${data.linear}, w=${data.angular}`);
-    console.log(`[Telemetry] Teleop for ${data.robotId}: lin=${data.linear.toFixed(2)}, ang=${data.angular.toFixed(2)}`);
+    // console.log(`[Telemetry] Teleop for ${data.robotId}: lin=${data.linear.toFixed(2)}, ang=${data.angular.toFixed(2)}`);
     pub.publish(twist);
   }
 
