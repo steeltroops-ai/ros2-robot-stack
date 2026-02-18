@@ -70,6 +70,7 @@ This file is the agent's long-term working memory. Read it at the start of every
 - Map emits at 1Hz flood logs with `[Telemetry] Map received.` — throttle in future.
 - Multi-robot namespace support implemented (Phase 2).
 - Mock physics allows robots to pass through each other.
+- **Git Constraint**: Never `git push` without user permission or end-to-end feature completion. See `.agent/rules/git-usage.md`.
 
 ## 7. Robot Types Planned
 
@@ -91,5 +92,6 @@ This file is the agent's long-term working memory. Read it at the start of every
 | `docs/guides/3D_FRONTEND_DESIGN.md`  | R3F architecture, models      |
 | `docs/guides/ML_PERCEPTION.md`    | CV pipeline, API contracts       |
 | `docs/planning/AGENT_HANDOFF.md`  | Session handoff state            |
-| `.agent/rules/system-manifesto.md`| Agent behavioral rules           |
+| `.agent/rules/git-usage.md`    | Git & Deployment permission rules |
+| `.agent/rules/persona.md`      | Agent behavioral rules           |
 | `.agent/rules/how-to-think.md`    | Robotics mental models           |

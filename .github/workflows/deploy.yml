@@ -118,30 +118,45 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prune for Backend
+      - name: Pristine Prune for Backend
         run: |
           # Create a temporary branch for a clean HF push
           git checkout -b hf-deploy
           
-          # Remove frontend (The user doesn't want it on HF)
-          rm -rf apps/frontend
+          # 1. Prune 'apps' to keep only backend
+          if [ -d "apps" ]; then
+            find apps -mindepth 1 -maxdepth 1 ! -name 'backend' -exec rm -rf {} +
+          fi
           
-          # Update package.json to remove frontend workspace
+          # 2. Prune 'packages' to keep only shared-types
+          if [ -d "packages" ]; then
+            find packages -mindepth 1 -maxdepth 1 ! -name 'shared-types' -exec rm -rf {} +
+          fi
+          
+          # 3. Prune root level directories except the essentials
+          find . -maxdepth 1 -type d ! -name '.' ! -name '.git' ! -name 'apps' ! -name 'robotics' ! -name 'packages' -exec rm -rf {} +
+          
+          # 4. Prune root level files except the essentials
+          find . -maxdepth 1 -type f ! -name 'Dockerfile' ! -name 'hf_entrypoint.sh' ! -name 'package.json' ! -name 'bun.lock' ! -name 'README.md' ! -name '.dockerignore' -exec rm -rf {} +
+          
+          # 5. Update package.json to remove non-existent workspaces
           python3 -c '
           import json
+          import os
           with open("package.json", "r+") as f:
               data = json.load(f)
-              data["workspaces"] = [w for w in data["workspaces"] if "frontend" not in w]
+              # Only keep workspaces that actually still exist after pruning
+              data["workspaces"] = [w for w in data["workspaces"] if os.path.exists(w.replace("/*", ""))]
               f.seek(0)
               json.dump(data, f, indent=2)
               f.truncate()
           '
           
-          # Commit the pruned state
+          # Commit the pristine state
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add .
-          git commit -m "chore(deploy): prune frontend for HF push"
+          git commit -m "chore(deploy): pristine prune for backend-only HF push"
 
       - name: Build and Push to HF
         env:

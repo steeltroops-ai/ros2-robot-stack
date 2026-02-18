@@ -26,7 +26,7 @@ WORKDIR /app
 # Copy ONLY lockfiles and package.json to cache the "bun install" layer
 COPY package.json bun.lock ./
 COPY apps/backend/package.json ./apps/backend/
-COPY apps/frontend/package.json ./apps/frontend/
+COPY apps/frontend/package.json* ./apps/frontend/
 COPY packages/shared-types/package.json ./packages/shared-types/
 
 # Use BUN for ultra-fast multi-workspace installation
