@@ -1,7 +1,5 @@
-"use client";
-
 import { useEffect, useState, useRef } from "react";
-import { io, Socket } from "socket.io-client";
+import { socket } from "@/utils/socket";
 
 // Shared type (Should be in shared-types in production)
 export interface RobotState {
@@ -14,52 +12,93 @@ export interface RobotState {
   lastSeen: number;
 }
 
-const SOCKET_URL = "http://localhost:4000";
-
 export function useFleetTelemetry() {
   const [robots, setRobots] = useState<Map<string, RobotState>>(new Map());
-  const socketRef = useRef<Socket | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [mapData, setMapData] = useState<any>(null);
+  const [pathData, setPathData] = useState<{ x: number; y: number }[]>([]);
 
   useEffect(() => {
-    // 1. Initialize Socket
-    const socket = io(SOCKET_URL, {
-      transports: ["websocket"],
-      reconnectionAttempts: 5,
-    });
-    socketRef.current = socket;
-
-    // 2. Connection Handlers
-    socket.on("connect", () => {
+    function onConnect() {
       console.log("[Frontend] Connected to Telemetry Gateway");
       setIsConnected(true);
-    });
+      socket.emit("subscribe", "fleet");
+      socket.emit("subscribe", "diagnostics");
+    }
 
-    socket.on("disconnect", () => {
+    function onDisconnect() {
       console.log("[Frontend] Disconnected");
       setIsConnected(false);
-    });
+    }
 
-    // 3. Telemetry Listener
-    socket.on("telemetry", (data: any) => {
+    function onTelemetry(data: any) {
       setRobots((prev) => {
         const next = new Map(prev);
+        const existing = next.get(data.id) || { ...data, status: "ONLINE", lastSeen: 0 };
         next.set(data.id, {
+          ...existing,
           ...data,
           status: "ONLINE",
           lastSeen: Date.now(),
         });
         return next;
       });
-    });
+    }
+
+    function onMap(data: any) {
+        setMapData(data);
+    }
+
+    function onPlan(data: any) {
+        setPathData(data);
+    }
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.on("telemetry", onTelemetry);
+    socket.on("map", onMap);
+    socket.on("plan", onPlan);
+    
+    // Check initial state
+    if (socket.connected) {
+        onConnect();
+    }
 
     return () => {
-      socket.disconnect();
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.off("telemetry", onTelemetry);
+      socket.off("map", onMap);
+      socket.off("plan", onPlan);
     };
   }, []);
+
+  const sendControl = (robotId: string, linear: number, angular: number) => {
+    socket.emit("control", { robotId, linear, angular });
+  };
+
+  const subscribeToRobot = (robotId: string) => {
+    socket.emit("subscribe", `robot:${robotId}`);
+    setPathData([]); // Clear path on new sub
+  };
+
+  const unsubscribeFromRobot = (robotId: string) => {
+    socket.emit("unsubscribe", `robot:${robotId}`);
+  };
+
+
+  const sendNavigationGoal = (robotId: string, x: number, y: number, theta: number = 0) => {
+    socket.emit("navigate", { robotId, x, y, theta });
+  };
 
   return {
     robots: Array.from(robots.values()),
     isConnected,
+    sendControl,
+    sendNavigationGoal,
+    mapData,
+    pathData,
+    subscribeToRobot,
+    unsubscribeFromRobot,
   };
 }
