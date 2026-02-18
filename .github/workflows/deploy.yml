@@ -10,13 +10,15 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Build and Push to HF
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_SPACE: ${{ secrets.HF_SPACE }}
         run: |
-          git remote add hf https://root:$HF_TOKEN@huggingface.co/spaces/$HF_SPACE
+          git remote add hf https://root:$HF_TOKEN@huggingface.co/spaces/$HF_SPACE || git remote set-url hf https://root:$HF_TOKEN@huggingface.co/spaces/$HF_SPACE
           git push --force hf main
 
   deploy-frontend:
