@@ -102,7 +102,7 @@ jobs:
         working-directory: ./robotics/ros2_ws
         run: |
           /bin/bash -c "source /opt/ros/humble/setup.bash && colcon test --event-handlers console_direct+ --packages-select simulation_manager amr_navigation"
-          /bin/bash -c "source /opt/ros/humble/setup.bash && colcon test-result --summary"
+          /bin/bash -c "source /opt/ros/humble/setup.bash && colcon test-result"
 
   deploy-backend:
     needs: [changes, validate, ros-validate]
