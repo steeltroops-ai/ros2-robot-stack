@@ -94,7 +94,7 @@ function RobotPanelBody({
           <MapDisplay
             mapData={mapData}
             robots={robot
-              ? [{ id: robotId, x: robot.x, y: robot.y, theta: robot.theta, battery: robot.battery, status: "ONLINE" as const, lastSeen: Date.now() } satisfies RobotState]
+              ? [{ id: robotId, x: robot.x, y: robot.y, theta: robot.theta, battery: robot.battery, status: "ONLINE" as const, lastSeen: 0 } satisfies RobotState]
               : []
             }
           />

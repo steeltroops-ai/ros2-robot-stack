@@ -143,7 +143,9 @@ function getIdleState(time: number): BionicHandState {
 function Finger({
   lengths,
   widths,
-  refs,
+  ref0,
+  ref1,
+  ref2,
   position,
   splayAngle = 0,
   shellMat,
@@ -153,11 +155,9 @@ function Finger({
 }: {
   lengths: [number, number, number];
   widths: [number, number, number];
-  refs: [
-    React.RefObject<THREE.Group>,
-    React.RefObject<THREE.Group>,
-    React.RefObject<THREE.Group>,
-  ];
+  ref0: React.RefObject<THREE.Group>;
+  ref1: React.RefObject<THREE.Group>;
+  ref2: React.RefObject<THREE.Group>;
   position: [number, number, number];
   splayAngle?: number;
   shellMat: THREE.Material;
@@ -173,7 +173,7 @@ function Finger({
       </mesh>
 
       {/* Proximal Phalanx */}
-      <group ref={refs[0]}>
+      <group ref={ref0}>
         <mesh position={[lengths[0] / 2, 0, 0]} castShadow material={shellMat}>
           <boxGeometry args={[lengths[0], widths[0], widths[0] * 0.9]} />
         </mesh>
@@ -189,7 +189,7 @@ function Finger({
           </mesh>
 
           {/* Middle Phalanx */}
-          <group ref={refs[1]}>
+          <group ref={ref1}>
             <mesh position={[lengths[1] / 2, 0, 0]} castShadow material={shellMat}>
               <boxGeometry args={[lengths[1], widths[1], widths[1] * 0.85]} />
             </mesh>
@@ -201,7 +201,7 @@ function Finger({
               </mesh>
 
               {/* Distal Phalanx */}
-              <group ref={refs[2]}>
+              <group ref={ref2}>
                 <mesh position={[lengths[2] / 2, 0, 0]} castShadow material={padMat}>
                   <boxGeometry args={[lengths[2], widths[2], widths[2] * 0.8]} />
                 </mesh>
@@ -222,17 +222,17 @@ function Finger({
 // Sub-component: Thumb (unique kinematics)
 // ═══════════════════════════════════════════════════════════════════
 function Thumb({
-  refs,
+  ref0,
+  ref1,
+  ref2,
   shellMat,
   jointMat,
   padMat,
   glowMat,
 }: {
-  refs: [
-    React.RefObject<THREE.Group>,
-    React.RefObject<THREE.Group>,
-    React.RefObject<THREE.Group>,
-  ];
+  ref0: React.RefObject<THREE.Group>;
+  ref1: React.RefObject<THREE.Group>;
+  ref2: React.RefObject<THREE.Group>;
   shellMat: THREE.Material;
   jointMat: THREE.Material;
   padMat: THREE.Material;
@@ -245,7 +245,7 @@ function Thumb({
         <sphereGeometry args={[0.012, 12, 8]} />
       </mesh>
 
-      <group ref={refs[0]}>
+      <group ref={ref0}>
         {/* Metacarpal */}
         <mesh position={[0.018, 0, 0]} castShadow material={shellMat}>
           <boxGeometry args={[0.035, 0.022, 0.020]} />
@@ -257,7 +257,7 @@ function Thumb({
             <sphereGeometry args={[0.011, 12, 8]} />
           </mesh>
 
-          <group ref={refs[1]}>
+          <group ref={ref1}>
             {/* Proximal Phalanx */}
             <mesh position={[0.015, 0, 0]} castShadow material={shellMat}>
               <boxGeometry args={[0.03, 0.020, 0.018]} />
@@ -269,7 +269,7 @@ function Thumb({
                 <sphereGeometry args={[0.010, 12, 8]} />
               </mesh>
 
-              <group ref={refs[2]}>
+              <group ref={ref2}>
                 {/* Distal */}
                 <mesh position={[0.012, 0, 0]} castShadow material={padMat}>
                   <boxGeometry args={[0.025, 0.020, 0.018]} />
@@ -302,35 +302,25 @@ export function BionicHand({ stateRef }: BionicHandProps) {
   const wristYawRef = useRef<THREE.Group>(null!);
 
   // Fingers (3 joints each: MCP, PIP, DIP)
-  const indexRefs = [
-    useRef<THREE.Group>(null!),
-    useRef<THREE.Group>(null!),
-    useRef<THREE.Group>(null!),
-  ] as [React.RefObject<THREE.Group>, React.RefObject<THREE.Group>, React.RefObject<THREE.Group>];
+  const indexRef0 = useRef<THREE.Group>(null!);
+  const indexRef1 = useRef<THREE.Group>(null!);
+  const indexRef2 = useRef<THREE.Group>(null!);
 
-  const middleRefs = [
-    useRef<THREE.Group>(null!),
-    useRef<THREE.Group>(null!),
-    useRef<THREE.Group>(null!),
-  ] as [React.RefObject<THREE.Group>, React.RefObject<THREE.Group>, React.RefObject<THREE.Group>];
+  const middleRef0 = useRef<THREE.Group>(null!);
+  const middleRef1 = useRef<THREE.Group>(null!);
+  const middleRef2 = useRef<THREE.Group>(null!);
 
-  const ringRefs = [
-    useRef<THREE.Group>(null!),
-    useRef<THREE.Group>(null!),
-    useRef<THREE.Group>(null!),
-  ] as [React.RefObject<THREE.Group>, React.RefObject<THREE.Group>, React.RefObject<THREE.Group>];
+  const ringRef0 = useRef<THREE.Group>(null!);
+  const ringRef1 = useRef<THREE.Group>(null!);
+  const ringRef2 = useRef<THREE.Group>(null!);
 
-  const pinkyRefs = [
-    useRef<THREE.Group>(null!),
-    useRef<THREE.Group>(null!),
-    useRef<THREE.Group>(null!),
-  ] as [React.RefObject<THREE.Group>, React.RefObject<THREE.Group>, React.RefObject<THREE.Group>];
+  const pinkyRef0 = useRef<THREE.Group>(null!);
+  const pinkyRef1 = useRef<THREE.Group>(null!);
+  const pinkyRef2 = useRef<THREE.Group>(null!);
 
-  const thumbRefs = [
-    useRef<THREE.Group>(null!),
-    useRef<THREE.Group>(null!),
-    useRef<THREE.Group>(null!),
-  ] as [React.RefObject<THREE.Group>, React.RefObject<THREE.Group>, React.RefObject<THREE.Group>];
+  const thumbRef0 = useRef<THREE.Group>(null!);
+  const thumbRef1 = useRef<THREE.Group>(null!);
+  const thumbRef2 = useRef<THREE.Group>(null!);
 
   // Status ring
   const statusRingRef = useRef<THREE.Mesh>(null!);
@@ -467,20 +457,25 @@ export function BionicHand({ stateRef }: BionicHandProps) {
     if (wristYawRef.current) wristYawRef.current.rotation.y = cs.wristYaw;
 
     // Finger application (flexion = negative Z rotation for curl)
-    const applyFinger = (
-      refs: [React.RefObject<THREE.Group>, React.RefObject<THREE.Group>, React.RefObject<THREE.Group>],
-      values: [number, number, number]
-    ) => {
-      if (refs[0].current) refs[0].current.rotation.z = -values[0] * MAX_FLEX;
-      if (refs[1].current) refs[1].current.rotation.z = -values[1] * MAX_FLEX;
-      if (refs[2].current) refs[2].current.rotation.z = -values[2] * MAX_FLEX;
-    };
+    if (indexRef0.current) indexRef0.current.rotation.z = -cs.index[0] * MAX_FLEX;
+    if (indexRef1.current) indexRef1.current.rotation.z = -cs.index[1] * MAX_FLEX;
+    if (indexRef2.current) indexRef2.current.rotation.z = -cs.index[2] * MAX_FLEX;
 
-    applyFinger(indexRefs, cs.index);
-    applyFinger(middleRefs, cs.middle);
-    applyFinger(ringRefs, cs.ring);
-    applyFinger(pinkyRefs, cs.pinky);
-    applyFinger(thumbRefs, cs.thumb);
+    if (middleRef0.current) middleRef0.current.rotation.z = -cs.middle[0] * MAX_FLEX;
+    if (middleRef1.current) middleRef1.current.rotation.z = -cs.middle[1] * MAX_FLEX;
+    if (middleRef2.current) middleRef2.current.rotation.z = -cs.middle[2] * MAX_FLEX;
+
+    if (ringRef0.current) ringRef0.current.rotation.z = -cs.ring[0] * MAX_FLEX;
+    if (ringRef1.current) ringRef1.current.rotation.z = -cs.ring[1] * MAX_FLEX;
+    if (ringRef2.current) ringRef2.current.rotation.z = -cs.ring[2] * MAX_FLEX;
+
+    if (pinkyRef0.current) pinkyRef0.current.rotation.z = -cs.pinky[0] * MAX_FLEX;
+    if (pinkyRef1.current) pinkyRef1.current.rotation.z = -cs.pinky[1] * MAX_FLEX;
+    if (pinkyRef2.current) pinkyRef2.current.rotation.z = -cs.pinky[2] * MAX_FLEX;
+
+    if (thumbRef0.current) thumbRef0.current.rotation.z = -cs.thumb[0] * MAX_FLEX;
+    if (thumbRef1.current) thumbRef1.current.rotation.z = -cs.thumb[1] * MAX_FLEX;
+    if (thumbRef2.current) thumbRef2.current.rotation.z = -cs.thumb[2] * MAX_FLEX;
 
     // ── Status ring gentle pulse (muted amber) ──────────────────
     statusMat.emissiveIntensity = 0.5 + Math.sin(time * 2) * 0.2;
@@ -692,7 +687,9 @@ export function BionicHand({ stateRef }: BionicHandProps) {
 
                           {/* Index Finger */}
                           <Finger
-                            refs={indexRefs}
+                            ref0={indexRef0}
+                            ref1={indexRef1}
+                            ref2={indexRef2}
                             lengths={[0.04, 0.025, 0.02]}
                             widths={[0.018, 0.016, 0.014]}
                             position={[0.035, 0, -0.025]}
@@ -705,7 +702,9 @@ export function BionicHand({ stateRef }: BionicHandProps) {
 
                           {/* Middle Finger */}
                           <Finger
-                            refs={middleRefs}
+                            ref0={middleRef0}
+                            ref1={middleRef1}
+                            ref2={middleRef2}
                             lengths={[0.044, 0.028, 0.02]}
                             widths={[0.018, 0.016, 0.014]}
                             position={[0.038, 0, -0.008]}
@@ -718,7 +717,9 @@ export function BionicHand({ stateRef }: BionicHandProps) {
 
                           {/* Ring Finger */}
                           <Finger
-                            refs={ringRefs}
+                            ref0={ringRef0}
+                            ref1={ringRef1}
+                            ref2={ringRef2}
                             lengths={[0.04, 0.025, 0.018]}
                             widths={[0.017, 0.015, 0.013]}
                             position={[0.035, 0, 0.009]}
@@ -731,7 +732,9 @@ export function BionicHand({ stateRef }: BionicHandProps) {
 
                           {/* Pinky Finger */}
                           <Finger
-                            refs={pinkyRefs}
+                            ref0={pinkyRef0}
+                            ref1={pinkyRef1}
+                            ref2={pinkyRef2}
                             lengths={[0.032, 0.02, 0.015]}
                             widths={[0.015, 0.013, 0.011]}
                             position={[0.030, 0, 0.025]}
@@ -744,7 +747,9 @@ export function BionicHand({ stateRef }: BionicHandProps) {
 
                           {/* Thumb */}
                           <Thumb
-                            refs={thumbRefs}
+                            ref0={thumbRef0}
+                            ref1={thumbRef1}
+                            ref2={thumbRef2}
                             shellMat={shellMat}
                             jointMat={actuatorMat}
                             padMat={fingerPadMat}
