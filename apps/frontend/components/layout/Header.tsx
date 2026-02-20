@@ -5,16 +5,9 @@ import { useFleetTelemetry } from "@/hooks/useFleetTelemetry";
 import { Wifi, WifiOff, Bell, User, Bot } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-import { useState, useEffect } from "react";
-
 export default function Header({ noPadding = false }: { noPadding?: boolean }) {
   const { isConnected, robots } = useFleetTelemetry();
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) return null;
 
   // Simple title mapper
   const getPageTitle = () => {
@@ -37,20 +30,34 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
 
   return (
     <header
-      className="flex items-center justify-between flex-shrink-0"
+      className="flex items-center justify-between flex-shrink-0 relative"
       style={{
         height: 64,
         padding: "0 2rem",
         background: "var(--color-surface-1)",
+        // borderBottom removed to merge seamlessly with sidebar
       }}
     >
+      {/* Seamless Inner Corner Fillet (Unibody Curve) */}
+      <div 
+        className="absolute pointer-events-none"
+        style={{
+          left: 0,
+          top: "100%",
+          width: "1rem",
+          height: "1rem",
+          background: "radial-gradient(circle at 100% 100%, transparent 1rem, var(--color-surface-1) 1rem)",
+          zIndex: 10
+        }}
+      />
       {/* Title Section */}
       <div className="flex flex-col justify-center">
         <h2
           style={{
-            fontSize: "1rem",
-            fontWeight: 700,
+            fontSize: "1.125rem",
+            fontWeight: 800,
             letterSpacing: "-0.02em",
+            fontFamily: "var(--font-inter), system-ui, sans-serif",
             color: "var(--color-text-0)",
             lineHeight: 1.1,
           }}
@@ -60,8 +67,8 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
         <span
           style={{
             fontSize: "0.75rem",
-            color: "var(--color-text-2)",
-            opacity: 0.7,
+            fontFamily: "var(--font-inter), system-ui, sans-serif",
+            color: "var(--color-text-3)",
             marginTop: "2px",
           }}
         >
@@ -75,36 +82,39 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
         <div className="flex items-center gap-2 mr-2">
           {/* Connection Pill */}
           <div 
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            className="flex items-center gap-2 px-3 py-1.5 rounded"
             style={{ 
-              background: isConnected ? "rgba(52, 199, 89, 0.1)" : "rgba(255, 59, 48, 0.1)",
-              border: `1px solid ${isConnected ? "rgba(52, 199, 89, 0.2)" : "rgba(255, 59, 48, 0.2)"}`
+              background: isConnected ? "rgba(16, 185, 129, 0.15)" : "rgba(239, 68, 68, 0.15)",
+              border: `1px solid ${isConnected ? "rgba(16, 185, 129, 0.5)" : "rgba(239, 68, 68, 0.5)"}`,
+              boxShadow: isConnected ? "0 0 10px rgba(16, 185, 129, 0.2)" : "0 0 10px rgba(239, 68, 68, 0.2)"
             }}
           >
             <div 
-              className={`w-1.5 h-1.5 rounded-full ${isConnected ? "bg-green-500 animate-pulse" : "bg-red-500"}`} 
+              className={`w-1.5 h-1.5 rounded-full ${isConnected ? "bg-[#10b981] animate-pulse" : "bg-[#ef4444]"}`} 
+              style={{ boxShadow: isConnected ? "0 0 8px #10b981" : "0 0 8px #ef4444" }}
             />
             <span style={{ 
               fontSize: "0.6875rem", 
-              fontWeight: 700, 
-              color: isConnected ? "#1a7f37" : "#d73a49",
-              letterSpacing: "0.02em"
+              fontWeight: 600, 
+              fontFamily: "var(--font-inter), system-ui, sans-serif",
+              color: isConnected ? "#10b981" : "#ef4444",
             }}>
-              {isConnected ? "LIVE" : "OFFLINE"}
+              {isConnected ? "Connected" : "Disconnected"}
             </span>
           </div>
 
           {/* Fleet Count Pill */}
           <Link 
             href="/"
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all hover:bg-black/5"
+            className="flex items-center gap-2 px-3 py-1.5 rounded transition-all hover:bg-white/5"
             style={{ 
-              background: "var(--color-surface-0)",
-              border: "1px solid var(--color-border-0)"
+              background: "rgba(255, 255, 255, 0.05)",
+              border: "1px solid var(--color-border-0)",
+              backdropFilter: "blur(4px)"
             }}
           >
-            <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: "var(--color-text-0)" }}>
-              {robots.length} UNITS
+            <span style={{ fontSize: "0.6875rem", fontWeight: 600, fontFamily: "var(--font-inter), system-ui, sans-serif", color: "var(--color-text-0)" }}>
+              {robots.length} fleet units
             </span>
           </Link>
         </div>
@@ -112,19 +122,20 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
         {/* User Profile */}
         <div className="flex items-center gap-3 pl-4 border-l border-[var(--color-border-0)]">
            <button 
-            className="w-9 h-9 flex items-center justify-center transition-all hover:bg-black/5 rounded-full text-zinc-500"
+            className="w-9 h-9 flex items-center justify-center transition-all hover:bg-white/10 hover:text-white rounded text-zinc-400"
           >
             <Bell size={18} />
           </button>
           
           <div 
-            className="w-9 h-9 rounded-full flex items-center justify-center shadow-sm"
+            className="w-9 h-9 rounded flex items-center justify-center shadow-sm"
             style={{ 
               background: "var(--color-primary)", 
-              color: "var(--color-primary-foreground)" 
+              color: "var(--color-primary-foreground)",
+              boxShadow: "0 0 10px rgba(16, 185, 129, 0.4)"
             }}
           >
-            <span style={{ fontSize: "0.75rem", fontWeight: 700 }}>AD</span>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, fontFamily: "var(--font-inter), system-ui, sans-serif" }}>OP</span>
           </div>
         </div>
       </div>
