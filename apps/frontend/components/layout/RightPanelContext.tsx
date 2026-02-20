@@ -13,8 +13,10 @@ import {
 interface RightPanelState {
   /** The JSX to render inside the panel body */
   content: ReactNode;
-  /** Short label shown in the panel header (e.g. "Control Station") */
-  title: string;
+  /** Short label shown in the panel header (e.g. "Control Station") or a custom ReactNode */
+  title: ReactNode;
+  /** Unique key for cross-fading non-string titles */
+  titleKey?: string;
   /** Optional badge text next to the title (e.g. "LIVE", "SIM") */
   badge?: string;
   /** Badge colour variant */

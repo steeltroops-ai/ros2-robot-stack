@@ -157,11 +157,10 @@ export default function Sidebar({
                 <Link
                   key={item.id}
                   href={item.href}
-                  className={`flex items-center transition-all duration-300 group/link relative ${isCollapsed ? 'justify-center' : ''}`}
+                  className="flex items-center transition-colors duration-200 group/link relative"
                   style={{
                     height: "2.5rem",
-                    width: isCollapsed ? "2.5rem" : "100%",
-                    margin: isCollapsed ? "0 auto" : "0",
+                    width: "100%",
                     borderRadius: "0.5rem",
                     fontSize: "0.75rem",
                     fontWeight: isActive ? 600 : 500,
@@ -176,7 +175,7 @@ export default function Sidebar({
                   {isActive && !isCollapsed && (
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] bg-white rounded-r-md shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
                   )}
-                  <div style={{ width: isCollapsed ? '100%' : 40, display: 'flex', justifyContent: 'center', alignItems: 'center', opacity: isActive ? 1 : 0.7, flexShrink: 0 }}>
+                  <div style={{ width: 40, display: 'flex', justifyContent: 'center', alignItems: 'center', opacity: isActive ? 1 : 0.7, flexShrink: 0 }}>
                     {item.icon}
                   </div>
                   {!isCollapsed && <span className="flex-1 truncate pr-4">{item.label}</span>}
@@ -209,11 +208,10 @@ export default function Sidebar({
                 <Link
                   key={item.id}
                   href={item.href}
-                  className={`flex items-center transition-all duration-300 group/link relative ${isCollapsed ? 'justify-center' : ''}`}
+                  className="flex items-center transition-colors duration-200 group/link relative"
                   style={{
                     height: "2.5rem",
-                    width: isCollapsed ? "2.5rem" : "100%",
-                    margin: isCollapsed ? "0 auto" : "0",
+                    width: "100%",
                     borderRadius: "0.5rem",
                     fontSize: "0.75rem",
                     fontWeight: isActive ? 600 : 500,
@@ -228,7 +226,7 @@ export default function Sidebar({
                   {isActive && !isCollapsed && (
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] bg-white rounded-r-md shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
                   )}
-                  <div style={{ width: isCollapsed ? '100%' : 40, display: 'flex', justifyContent: 'center', alignItems: 'center', opacity: isActive ? 1 : 0.7, flexShrink: 0 }}>
+                  <div style={{ width: 40, display: 'flex', justifyContent: 'center', alignItems: 'center', opacity: isActive ? 1 : 0.7, flexShrink: 0 }}>
                     {item.icon}
                   </div>
                   {!isCollapsed && <span className="flex-1 truncate pr-4">{item.label}</span>}
@@ -282,11 +280,10 @@ export default function Sidebar({
                 <Link
                   key={robot.id}
                   href={href}
-                  className={`flex items-center transition-all duration-300 group/link relative ${isCollapsed ? 'justify-center' : ''}`}
+                  className="flex items-center transition-colors duration-200 group/link relative"
                   style={{
                     height: "2.5rem",
-                    width: isCollapsed ? "2.5rem" : "100%",
-                    margin: isCollapsed ? "0 auto" : "0",
+                    width: "100%",
                     borderRadius: "0.5rem",
                     fontSize: "0.75rem",
                     fontWeight: isActive ? 600 : 500,
@@ -301,7 +298,7 @@ export default function Sidebar({
                   {isActive && !isCollapsed && (
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] bg-white rounded-r-md shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
                   )}
-                  <div style={{ width: isCollapsed ? '100%' : 40, display: 'flex', justifyContent: 'center', alignItems: 'center', opacity: isActive ? 1 : 0.7, flexShrink: 0 }}>
+                  <div style={{ width: 40, display: 'flex', justifyContent: 'center', alignItems: 'center', opacity: isActive ? 1 : 0.7, flexShrink: 0 }}>
                     <Activity size={20} />
                   </div>
                   {!isCollapsed && (
@@ -332,7 +329,7 @@ export default function Sidebar({
               style={{
                 width: 32,
                 height: 32,
-                borderRadius: "0.25rem",
+                borderRadius: "50%",
                 background: "var(--color-primary)",
                 fontSize: "0.6875rem",
                 fontWeight: 600,

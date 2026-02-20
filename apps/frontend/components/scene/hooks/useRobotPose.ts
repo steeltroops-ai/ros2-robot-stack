@@ -46,8 +46,8 @@ export function useRobotPose(
 
   // When external pose updates, update the target
   useEffect(() => {
-    targetPose.current = { ...pose };
-  }, [pose]);
+    targetPose.current = { x: pose.x, y: pose.y, theta: pose.theta };
+  }, [pose.x, pose.y, pose.theta]);
 
   // Force-sync on mount
   useEffect(() => {

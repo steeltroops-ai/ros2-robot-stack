@@ -1,17 +1,9 @@
 "use client";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useFleetTelemetry } from "@/hooks/useFleetTelemetry";
 import { useDashboardPanel } from "@/components/layout/panel-content/DashboardPanelContent";
 import {
-  Bot,
-  Battery,
-  Gauge,
-  Wifi,
-  WifiOff,
   ChevronRight,
-  Navigation,
-  CircleStop,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
@@ -68,7 +60,7 @@ function LabDashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const { robots, isConnected, sendControl, subscribeToRobot, unsubscribeFromRobot } =
+  const { robots, isConnected, subscribeToRobot, unsubscribeFromRobot } =
     useFleetTelemetry();
   const selectedRobot = searchParams.get("robot");
 
@@ -88,22 +80,14 @@ function LabDashboard() {
     return () => { if (selectedRobot) unsubscribeFromRobot(selectedRobot); };
   }, [selectedRobot, subscribeToRobot, unsubscribeFromRobot]);
 
-  const selectedData = robots.find((r) => r.id === selectedRobot);
   const avgBattery =
     robots.length > 0
       ? Math.round(robots.reduce((a, r) => a + r.battery, 0) / robots.length)
       : 0;
 
-  // ── Register right panel content ──────────────────────────────────────────
+  // ── Register right panel content (only re-sets on selection change) ───────
   useDashboardPanel({
     selectedRobotId: selectedRobot,
-    selectedData: selectedData
-      ? { x: selectedData.x, y: selectedData.y, theta: selectedData.theta, battery: selectedData.battery }
-      : undefined,
-    robotCount: robots.length,
-    avgBattery,
-    isConnected,
-    sendControl,
     onDeselect: () => setSelectedRobot(null),
   });
 

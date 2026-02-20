@@ -1,7 +1,7 @@
 "use client";
 
-import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useEffect, useRef, useMemo } from "react";
 import * as THREE from "three";
 import { getSocket } from "@/utils/socket";
 
@@ -19,7 +19,8 @@ interface LidarScannerProps {
 
 export function LidarScanner({ robotId }: LidarScannerProps) {
   const pointsRef = useRef<THREE.Points>(null!);
-  const [scanData, setScanData] = useState<ScanMsg | null>(null);
+  // Store scan data in a ref — zero-cost, no React re-renders from socket
+  const scanDataRef = useRef<ScanMsg | null>(null);
 
   // Buffer Geometry for Points
   // Max ranges usually 360 or 720. Let's reserve 1080 to be safe.
@@ -43,13 +44,13 @@ export function LidarScanner({ robotId }: LidarScannerProps) {
     blending: THREE.AdditiveBlending
   }), []);
 
-  // Socket Listener
+  // Socket Listener — writes to ref only, never triggers React state update
   useEffect(() => {
     if (typeof window === "undefined") return;
     const socket = getSocket();
     
     const handler = (data: ScanMsg) => {
-        setScanData(data);
+      scanDataRef.current = data;
     };
 
     socket.on("scan", handler);
@@ -60,6 +61,7 @@ export function LidarScanner({ robotId }: LidarScannerProps) {
 
   // Update Geometry Frame Loop
   useFrame(() => {
+    const scanData = scanDataRef.current;
     if (!scanData || !pointsRef.current) return;
     
     const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;

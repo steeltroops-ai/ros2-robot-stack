@@ -12,6 +12,7 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
   // Simple title mapper
   const getPageTitle = () => {
     if (pathname === "/") return "Control center";
+    if (pathname === "/projects/hand") return "Bionic Hand";
     if (pathname.startsWith("/robots/")) {
       const id = pathname.split("/").pop();
       return `Node: ${id?.replace(/robot_/i, "Node-").toUpperCase()}`;
@@ -24,6 +25,7 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
 
   const getPageSubtitle = () => {
     if (pathname === "/") return "Personal robotics lab management";
+    if (pathname === "/projects/hand") return "Neuro-adaptive bionic manipulator · 24 DOF · RL-powered dexterity";
     if (pathname.startsWith("/robots/")) return "Individual node telemetry and active controls";
     return "R&D workspace management system";
   };
@@ -128,7 +130,7 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
           </button>
           
           <div 
-            className="w-9 h-9 rounded flex items-center justify-center shadow-sm"
+            className="w-9 h-9 rounded-full flex items-center justify-center shadow-sm"
             style={{ 
               background: "var(--color-primary)", 
               color: "var(--color-primary-foreground)",

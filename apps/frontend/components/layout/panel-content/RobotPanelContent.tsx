@@ -4,7 +4,8 @@ import { useEffect } from "react";
 import { useRightPanel } from "@/components/layout/RightPanelContext";
 import { TeleopPanel } from "@/components/telemetry/TeleopPanel";
 import { MapDisplay } from "@/components/map/MapDisplay";
-import type { MapData, RobotState } from "@/hooks/useFleetTelemetry";
+import { useFleetTelemetry } from "@/hooks/useFleetTelemetry";
+import type { RobotState } from "@/hooks/useFleetTelemetry";
 
 // ─── DataTile (shared micro-component) ───────────────────────────────────────
 function DataTile({ label, value }: { label: string; value: string }) {
@@ -48,17 +49,12 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 // ─── Robot page panel body ────────────────────────────────────────────────────
-function RobotPanelBody({
-  robotId,
-  robot,
-  mapData,
-  sendControl,
-}: {
-  robotId: string;
-  robot: { x: number; y: number; theta: number; battery: number } | undefined;
-  mapData: MapData | null;
-  sendControl: (id: string, lin: number, ang: number) => void;
-}) {
+// Reads live telemetry internally so the parent hook doesn't need
+// to re-create this JSX on every position tick.
+function RobotPanelBody({ robotId }: { robotId: string }) {
+  const { robots, sendControl, mapData } = useFleetTelemetry();
+  const robot = robots.find((r) => r.id === robotId);
+
   return (
     <div className="flex flex-col gap-5 h-full overflow-y-auto px-5 py-4">
       {/* Robot ID breadcrumb */}
@@ -121,31 +117,22 @@ function RobotPanelBody({
 /** Register the robot page content in the shared right panel. */
 export function useRobotPanel({
   robotId,
-  robot,
-  mapData,
-  sendControl,
 }: {
   robotId: string;
-  robot: { x: number; y: number; theta: number; battery: number } | undefined;
-  mapData: MapData | null;
-  sendControl: (id: string, lin: number, ang: number) => void;
+  robot?: { x: number; y: number; theta: number; battery: number } | undefined;
+  mapData?: unknown;
+  sendControl?: (id: string, lin: number, ang: number) => void;
 }) {
   const { setPanel } = useRightPanel();
 
   useEffect(() => {
     setPanel({
       title: "Control Station",
-      badge: robot ? "LIVE" : "OFFLINE",
-      badgeVariant: robot ? "green" : "grey",
-      content: (
-        <RobotPanelBody
-          robotId={robotId}
-          robot={robot}
-          mapData={mapData}
-          sendControl={sendControl}
-        />
-      ),
+      badge: "LIVE",
+      badgeVariant: "green",
+      content: <RobotPanelBody robotId={robotId} />,
     });
+  // Only re-create panel content when the robotId changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [robotId, robot?.x, robot?.y, robot?.theta, robot?.battery, mapData]);
+  }, [robotId]);
 }

@@ -16,7 +16,7 @@ export default function RobotPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { robots, sendControl, sendNavigationGoal, mapData, pathData, subscribeToRobot, unsubscribeFromRobot } =
+  const { robots, sendNavigationGoal, pathData, subscribeToRobot, unsubscribeFromRobot } =
     useFleetTelemetry();
   const robot = robots.find((r) => r.id === id);
 
@@ -31,15 +31,8 @@ export default function RobotPage({
     [id, sendNavigationGoal]
   );
 
-  // ── Inject content into the shared right panel ────────────────────────────
-  useRobotPanel({
-    robotId: id,
-    robot: robot
-      ? { x: robot.x, y: robot.y, theta: robot.theta, battery: robot.battery }
-      : undefined,
-    mapData,
-    sendControl,
-  });
+  // ── Inject content into the shared right panel (only re-sets on robotId change) ──
+  useRobotPanel({ robotId: id });
 
   return (
     <div className="w-full h-full relative rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] bg-black/40">
@@ -52,3 +45,4 @@ export default function RobotPage({
     </div>
   );
 }
+

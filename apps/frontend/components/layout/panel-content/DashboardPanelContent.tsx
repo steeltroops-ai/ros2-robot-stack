@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRightPanel } from "@/components/layout/RightPanelContext";
 import { TeleopPanel } from "@/components/telemetry/TeleopPanel";
+import { useFleetTelemetry } from "@/hooks/useFleetTelemetry";
 import dynamic from "next/dynamic";
 import { CircleStop } from "lucide-react";
 
@@ -42,17 +43,18 @@ function DataTile({ label, value }: { label: string; value: string | undefined }
 }
 
 // ─── Content rendered inside the right panel for the dashboard ───────────────
+// Reads live telemetry internally so the parent doesn't need to re-set panel content
+// on every position tick.
 function DashboardPanelBody({
   selectedRobotId,
-  selectedData,
-  sendControl,
   onDeselect,
 }: {
   selectedRobotId: string;
-  selectedData: { x: number; y: number; theta: number; battery: number } | undefined;
-  sendControl: (id: string, lin: number, ang: number) => void;
   onDeselect: () => void;
 }) {
+  const { robots, sendControl } = useFleetTelemetry();
+  const selectedData = robots.find((r) => r.id === selectedRobotId);
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Deselect button row */}
@@ -138,15 +140,14 @@ function DashboardPanelBody({
 }
 
 // ─── No-robot-selected state ─────────────────────────────────────────────────
-function DashboardIdleBody({
-  robotCount,
-  avgBattery,
-  isConnected,
-}: {
-  robotCount: number;
-  avgBattery: number;
-  isConnected: boolean;
-}) {
+// Reads live telemetry internally to avoid parent re-setting panel on every tick
+function DashboardIdleBody() {
+  const { robots, isConnected } = useFleetTelemetry();
+  const robotCount = robots.length;
+  const avgBattery = robotCount > 0
+    ? Math.round(robots.reduce((a, r) => a + r.battery, 0) / robotCount)
+    : 0;
+
   return (
     <div className="flex flex-col gap-5 px-5 py-4">
       <p style={{ fontSize: "0.75rem", color: "var(--color-text-3)", lineHeight: 1.6 }}>
@@ -180,23 +181,19 @@ function DashboardIdleBody({
 // ─── Hook — call this from the dashboard page ─────────────────────────────────
 /**
  * Registers dashboard content in the shared right panel.
- * Call at the top of FleetDashboard, re-run whenever selection changes.
+ * ONLY re-sets panel JSX when selection changes — NOT on every telemetry tick.
+ * The panel body components read telemetry internally.
  */
 export function useDashboardPanel({
   selectedRobotId,
-  selectedData,
-  robotCount,
-  avgBattery,
-  isConnected,
-  sendControl,
   onDeselect,
 }: {
   selectedRobotId: string | null;
-  selectedData: { x: number; y: number; theta: number; battery: number } | undefined;
-  robotCount: number;
-  avgBattery: number;
-  isConnected: boolean;
-  sendControl: (id: string, lin: number, ang: number) => void;
+  selectedData?: { x: number; y: number; theta: number; battery: number } | undefined;
+  robotCount?: number;
+  avgBattery?: number;
+  isConnected?: boolean;
+  sendControl?: (id: string, lin: number, ang: number) => void;
   onDeselect: () => void;
 }) {
   const { setPanel } = useRightPanel();
@@ -210,8 +207,6 @@ export function useDashboardPanel({
         content: (
           <DashboardPanelBody
             selectedRobotId={selectedRobotId}
-            selectedData={selectedData}
-            sendControl={sendControl}
             onDeselect={onDeselect}
           />
         ),
@@ -219,17 +214,12 @@ export function useDashboardPanel({
     } else {
       setPanel({
         title: "Agent Network",
-        badge: isConnected ? "LIVE" : "OFFLINE",
-        badgeVariant: isConnected ? "green" : "grey",
-        content: (
-          <DashboardIdleBody
-            robotCount={robotCount}
-            avgBattery={avgBattery}
-            isConnected={isConnected}
-          />
-        ),
+        badge: "LIVE",
+        badgeVariant: "green",
+        content: <DashboardIdleBody />,
       });
     }
+  // Only re-create panel content when the selection itself changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRobotId, selectedData?.x, selectedData?.y, selectedData?.theta, selectedData?.battery, robotCount, avgBattery, isConnected]);
+  }, [selectedRobotId]);
 }

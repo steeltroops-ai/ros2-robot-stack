@@ -13,6 +13,9 @@ interface MapDisplayProps {
 
 export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDisplayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Cache the expensive map ImageData so we don't recompute pixels every robot tick
+  const cachedMapImage = useRef<ImageData | null>(null);
+  const cachedMapDataRef = useRef<MapData | null>(null);
 
   const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!mapData || !onSelectRobot) return;
@@ -47,8 +50,11 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
     onSelectRobot(found);
   };
 
+  // ── Phase 1: Expensive map pixel rendering — only when mapData changes ──
   useEffect(() => {
     if (!mapData || !canvasRef.current) return;
+    // Skip if the same mapData ref
+    if (mapData === cachedMapDataRef.current && cachedMapImage.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -56,7 +62,6 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
 
     const width = mapData.info.width;
     const height = mapData.info.height;
-    const resolution = mapData.info.resolution;
 
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
@@ -71,13 +76,10 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
       let r = 5, g = 5, b = 5, a = 0; // unknown
 
       if (val === 0) {
-        // free space - faint frosted glass
         r = 255; g = 255; b = 255; a = 15;
       } else if (val === 100) {
-        // occupied - bright neon primary
         r = 16; g = 185; b = 129; a = 255;
       } else if (val > 0) {
-        // partial occupied - glowing edge
         r = 16; g = 185; b = 129; a = Math.max(80, Math.floor(val * 2.55));
       }
 
@@ -88,12 +90,32 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
       imgData.data[targetIndex * 4 + 0] = r;
       imgData.data[targetIndex * 4 + 1] = g;
       imgData.data[targetIndex * 4 + 2] = b;
-      imgData.data[targetIndex * 4 + 3] = val === -1 ? 0 : a; // Transparent for unknown
+      imgData.data[targetIndex * 4 + 3] = val === -1 ? 0 : a;
     }
 
-    ctx.putImageData(imgData, 0, 0);
+    // Cache the computed image data
+    cachedMapImage.current = imgData;
+    cachedMapDataRef.current = mapData;
 
-    // Draw robots
+    ctx.putImageData(imgData, 0, 0);
+  }, [mapData]);
+
+  // ── Phase 2: Cheap robot overlay — runs on robot position / selection changes ──
+  useEffect(() => {
+    if (!mapData || !canvasRef.current || !cachedMapImage.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const width = mapData.info.width;
+    const height = mapData.info.height;
+    const resolution = mapData.info.resolution;
+
+    // Restore the cached map base (clears previous robot dots)
+    ctx.putImageData(cachedMapImage.current, 0, 0);
+
+    // Draw robots (cheap — just a few circles)
     robots.forEach((robot) => {
       const originX = mapData.info.origin?.position.x || 0;
       const originY = mapData.info.origin?.position.y || 0;
@@ -104,7 +126,6 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
       const canvasY = height - py;
       const canvasX = px;
 
-      // Robot dot — primary neon glow
       const isSelected = selectedId === robot.id;
       
       if (isSelected) {
@@ -131,7 +152,7 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
       const dx = Math.cos(robot.theta) * headLen;
       const dy = Math.sin(robot.theta) * headLen;
 
-      ctx.strokeStyle = isSelected ? "#10b981" : "#10b981";
+      ctx.strokeStyle = "#10b981";
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(canvasX, canvasY);

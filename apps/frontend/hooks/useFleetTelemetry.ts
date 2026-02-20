@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getSocket } from "@/utils/socket";
 
 export interface RobotState {
@@ -34,110 +34,147 @@ export interface MapData {
   data: number[];
 }
 
-export function useFleetTelemetry() {
-  const [robots, setRobots] = useState<Map<string, RobotState>>(new Map());
-  const [isConnected, setIsConnected] = useState(false);
-  const [mapData, setMapData] = useState<MapData | null>(null);
-  const [pathData, setPathData] = useState<{ x: number; y: number }[]>([]);
-  
-  // Use ref to avoid stale closure issues
-  const socketRef = useRef(typeof window !== "undefined" ? getSocket() : null);
+// ─── Global State & Throttling ──────────────────────────────────────────────
+let globalRobotsMap = new Map<string, RobotState>();
+let globalIsConnected = false;
+let globalMapData: MapData | null = null;
+let globalPathData: { x: number; y: number }[] = [];
 
-  useEffect(() => {
-    const socket = socketRef.current;
-    if (!socket) return;
+const listeners = new Set<() => void>();
+
+let notifyPending = false;
+function notifyListeners() {
+  if (notifyPending) return;
+  notifyPending = true;
+  // 100ms throttle (10Hz max React render rate) to prevent UI thread starvation
+  setTimeout(() => {
+    listeners.forEach((listener) => listener());
+    notifyPending = false;
+  }, 100);
+}
+
+// ─── Global Socket Init ──────────────────────────────────────────────────────
+let isInitialized = false;
+
+function initGlobalTelemetry() {
+  if (typeof window === "undefined" || isInitialized) return;
+  isInitialized = true;
+
+  const socket = getSocket();
+
+  function trigger() {
+    notifyListeners();
+  }
+
+  socket.on("connect", () => {
+    console.log("[Frontend] Connected to Telemetry Gateway");
+    globalIsConnected = true;
+    socket.emit("subscribe", "fleet");
+    socket.emit("subscribe", "diagnostics");
+    trigger();
+  });
+
+  socket.on("disconnect", () => {
+    console.log("[Frontend] Disconnected");
+    globalIsConnected = false;
+    trigger();
+  });
+
+  socket.on("connect_error", (err: Error) => {
+    console.warn("[Frontend] Backend not available, retrying...", err.message);
+  });
+
+  socket.on("telemetry", (data: TelemetryData) => {
+    const existing = globalRobotsMap.get(data.id) || {
+      ...data,
+      status: "ONLINE",
+      lastSeen: 0,
+    };
     
-    function onConnect() {
-      console.log("[Frontend] Connected to Telemetry Gateway");
-      setIsConnected(true);
-      socket!.emit("subscribe", "fleet");
-      socket!.emit("subscribe", "diagnostics");
-    }
+    // Mutate the map, but trigger a throttled React render
+    globalRobotsMap.set(data.id, {
+      ...existing,
+      ...data,
+      status: "ONLINE",
+      lastSeen: Date.now(),
+    } as RobotState);
+    
+    trigger();
+  });
 
-    function onDisconnect() {
-      console.log("[Frontend] Disconnected");
-      setIsConnected(false);
-    }
+  socket.on("map", (data: MapData) => {
+    globalMapData = data;
+    trigger();
+  });
 
-    function onConnectError(err: Error) {
-      // Silently handle connection errors - the socket will retry automatically
-      // Only log once to avoid console spam
-      console.warn("[Frontend] Backend not available, retrying...", err.message);
-    }
+  socket.on("plan", (data: { x: number; y: number }[]) => {
+    globalPathData = data;
+    trigger();
+  });
 
-    function onTelemetry(data: TelemetryData) {
-      setRobots((prev) => {
-        const next = new Map(prev);
-        const existing = next.get(data.id) || { ...data, status: "ONLINE", lastSeen: 0 };
-        next.set(data.id, {
-          ...existing,
-          ...data,
-          status: "ONLINE",
-          lastSeen: Date.now(),
-        } as RobotState);
-        return next;
-      });
-    }
+  if (!socket.connected) {
+    socket.connect();
+  } else {
+    globalIsConnected = true;
+    socket.emit("subscribe", "fleet");
+    socket.emit("subscribe", "diagnostics");
+    trigger();
+  }
+}
 
-    function onMap(data: MapData) {
-      setMapData(data);
-    }
+// ─── Hook ───────────────────────────────────────────────────────────────────
+export function useFleetTelemetry() {
+  // Initialize socket listeners only once globally
+  useEffect(() => {
+    initGlobalTelemetry();
+  }, []);
 
-    function onPlan(data: { x: number; y: number }[]) {
-      setPathData(data);
-    }
-
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-    socket.on("connect_error", onConnectError);
-    socket.on("telemetry", onTelemetry);
-    socket.on("map", onMap);
-    socket.on("plan", onPlan);
-
-    // Explicitly connect now (autoConnect is false)
-    if (!socket.connected) {
-      socket.connect();
-    } else {
-      // Already connected (e.g., from another hook instance)
-      onConnect();
-    }
-
+  // Force re-renders bounded by the 100ms throttle block above
+  const [, forceRender] = useState({});
+  useEffect(() => {
+    const listener = () => forceRender({});
+    listeners.add(listener);
+    // Return early snapshot render exactly once on mount
+    listener();
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-      socket.off("connect_error", onConnectError);
-      socket.off("telemetry", onTelemetry);
-      socket.off("map", onMap);
-      socket.off("plan", onPlan);
+      listeners.delete(listener);
     };
   }, []);
 
-  // Memoized control sender — stable reference prevents re-subscription loops
-  const sendControl = useCallback((robotId: string, linear: number, angular: number) => {
-    socketRef.current?.emit("control", { robotId, linear, angular });
-  }, []);
+  // Memoized methods interacting with socket directly
+  const sendControl = useCallback(
+    (robotId: string, linear: number, angular: number) => {
+      getSocket().emit("control", { robotId, linear, angular });
+    },
+    []
+  );
 
-  // Memoized subscribe/unsubscribe to prevent infinite re-render loops in useEffect deps
   const subscribeToRobot = useCallback((robotId: string) => {
-    socketRef.current?.emit("subscribe", `robot:${robotId}`);
-    setPathData([]); // Clear path on new sub
+    getSocket().emit("subscribe", `robot:${robotId}`);
+    globalPathData = []; // Clear current path line
+    notifyListeners();
   }, []);
 
   const unsubscribeFromRobot = useCallback((robotId: string) => {
-    socketRef.current?.emit("unsubscribe", `robot:${robotId}`);
+    getSocket().emit("unsubscribe", `robot:${robotId}`);
   }, []);
 
-  const sendNavigationGoal = useCallback((robotId: string, x: number, y: number, theta: number = 0) => {
-    socketRef.current?.emit("navigate", { robotId, x, y, theta });
-  }, []);
+  const sendNavigationGoal = useCallback(
+    (robotId: string, x: number, y: number, theta: number = 0) => {
+      getSocket().emit("navigate", { robotId, x, y, theta });
+    },
+    []
+  );
 
+  // Return a fresh array copy each render so React detects diffs,
+  // but note that this only happens max 10 times a sec!
   return {
-    robots: Array.from(robots.values()),
-    isConnected,
+    robots: Array.from(globalRobotsMap.values()),
+    isConnected: globalIsConnected,
+    mapData: globalMapData,
+    pathData: globalPathData,
     sendControl,
     sendNavigationGoal,
-    mapData,
-    pathData,
     subscribeToRobot,
     unsubscribeFromRobot,
   };

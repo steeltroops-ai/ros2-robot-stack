@@ -23,6 +23,8 @@ export function getSocket(): Socket {
   return _socket;
 }
 
-// Legacy export for backward compatibility — returns the lazy singleton
-// This is safe because autoConnect is false; callers must .connect() explicitly
-export const socket: Socket = typeof window !== "undefined" ? getSocket() : (null as unknown as Socket);
+// Legacy export — use getSocket() instead.
+// This is a property getter so it's SSR-safe; only accesses the socket
+// when code actually reads `socket`, not at module load time.
+export const socket = typeof window !== "undefined" ? getSocket() : (null as unknown as Socket);
+

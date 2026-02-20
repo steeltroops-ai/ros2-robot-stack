@@ -30,7 +30,7 @@ const PANEL_W  = 360;
  *     injected content cross-fades in when ready
  */
 export function RightPanel() {
-  const { title, badge, badgeVariant = "grey", content } = useRightPanel();
+  const { title, titleKey, badge, badgeVariant = "grey", content } = useRightPanel();
   const bs = BADGE_STYLES[badgeVariant];
 
   return (
@@ -71,65 +71,68 @@ export function RightPanel() {
       {/* ── Panel Header ────────────────────────────────────────────────────
           height = HEADER_H so it aligns precisely with the global header row.
           Uses the same bottom-divider style as the sidebar's logo section. */}
-      <div
-        className="flex items-center justify-between px-6 flex-shrink-0"
-        style={{
-          height: HEADER_H,
-          borderBottom: "1px solid var(--color-border-0)",
-        }}
-      >
-        {/* Title — cross-fades when the page context pushes a new title */}
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={title}
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
-            transition={{ duration: 0.14 }}
-            style={{
-              fontSize: "1rem",
-              fontWeight: 600,
-              color: "var(--color-text-0)",
-              letterSpacing: "-0.01em",
-              fontFamily: "var(--font-inter), system-ui, sans-serif",
-            }}
-          >
-            {title}
-          </motion.span>
-        </AnimatePresence>
-
-        {/* Badge — cross-fades independently so colour change is smooth */}
-        <AnimatePresence mode="wait">
-          {badge && (
+      {!!title && (
+        <div
+          className="flex items-center justify-between px-6 flex-shrink-0"
+          style={{
+            height: HEADER_H,
+            borderBottom: "1px solid var(--color-border-0)",
+          }}
+        >
+          {/* Title — cross-fades when the page context pushes a new title */}
+          <AnimatePresence mode="wait">
             <motion.div
-              key={badge + badgeVariant}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
+              key={(titleKey || (typeof title === "string" ? title : "custom")) as string}
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 4 }}
               transition={{ duration: 0.14 }}
-              className="flex items-center gap-2 px-2.5 py-1 rounded-full"
-              style={{ background: bs.bg }}
+              className="flex-1 min-w-0 pr-4"
+              style={{
+                fontSize: "1rem",
+                fontWeight: 600,
+                color: "var(--color-text-0)",
+                letterSpacing: "-0.01em",
+                fontFamily: "var(--font-inter), system-ui, sans-serif",
+              }}
             >
-              <span
-                className="w-1.5 h-1.5 rounded-full animate-pulse"
-                style={{ display: "inline-block", background: bs.dot }}
-              />
-              <span
-                style={{
-                  fontSize: "0.6875rem",
-                  fontWeight: 700,
-                  color: bs.text,
-                  letterSpacing: "0.08em",
-                  fontFamily: "var(--font-mono), monospace",
-                  textTransform: "uppercase",
-                }}
-              >
-                {badge}
-              </span>
+              {title}
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+          </AnimatePresence>
+
+          {/* Badge — cross-fades independently so colour change is smooth */}
+          <AnimatePresence mode="wait">
+            {badge && (
+              <motion.div
+                key={badge + badgeVariant}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.14 }}
+                className="flex items-center gap-2 px-2.5 py-1 rounded-full"
+                style={{ background: bs.bg }}
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-pulse"
+                  style={{ display: "inline-block", background: bs.dot }}
+                />
+                <span
+                  style={{
+                    fontSize: "0.6875rem",
+                    fontWeight: 700,
+                    color: bs.text,
+                    letterSpacing: "0.08em",
+                    fontFamily: "var(--font-mono), monospace",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {badge}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* ── Panel Body ──────────────────────────────────────────────────────
           Content is injected by the active page via useRightPanel().setPanel().
@@ -137,7 +140,7 @@ export function RightPanel() {
       <div className="flex-1 overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
-            key={title}
+            key={(titleKey || (typeof title === "string" ? title : "custom")) as string}
             initial={{ opacity: 0, x: 14 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -14 }}
