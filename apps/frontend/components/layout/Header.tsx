@@ -11,14 +11,14 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
 
   // Simple title mapper
   const getPageTitle = () => {
-    if (pathname === "/") return "Control Center";
+    if (pathname === "/") return "Control center";
     if (pathname.startsWith("/robots/")) {
       const id = pathname.split("/").pop();
       return `Node: ${id?.replace(/robot_/i, "Node-").toUpperCase()}`;
     }
-    if (pathname === "/map") return "Global Live Map";
-    if (pathname === "/diagnostics") return "System Diagnostics";
-    if (pathname === "/settings") return "Control Settings";
+    if (pathname === "/map") return "Global live map";
+    if (pathname === "/diagnostics") return "System diagnostics";
+    if (pathname === "/settings") return "Control settings";
     return "Dashboard";
   };
 
