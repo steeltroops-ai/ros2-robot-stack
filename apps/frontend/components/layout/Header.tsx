@@ -11,10 +11,10 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
 
   // Simple title mapper
   const getPageTitle = () => {
-    if (pathname === "/") return "Fleet Overview";
+    if (pathname === "/") return "Control Center";
     if (pathname.startsWith("/robots/")) {
       const id = pathname.split("/").pop();
-      return `Robot: ${id?.replace("_", "-").toUpperCase()}`;
+      return `Node: ${id?.replace(/robot_/i, "Node-").toUpperCase()}`;
     }
     if (pathname === "/map") return "Global Live Map";
     if (pathname === "/diagnostics") return "System Diagnostics";
@@ -23,9 +23,9 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
   };
 
   const getPageSubtitle = () => {
-    if (pathname === "/") return "Real-time fleet monitoring and control";
-    if (pathname.startsWith("/robots/")) return "Individual unit telemetry and teleoperation";
-    return "Omniverse robotics management system";
+    if (pathname === "/") return "Personal robotics lab management";
+    if (pathname.startsWith("/robots/")) return "Individual node telemetry and active controls";
+    return "R&D workspace management system";
   };
 
   return (
@@ -114,7 +114,7 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
             }}
           >
             <span style={{ fontSize: "0.6875rem", fontWeight: 600, fontFamily: "var(--font-inter), system-ui, sans-serif", color: "var(--color-text-0)" }}>
-              {robots.length} fleet units
+              {robots.length} active nodes
             </span>
           </Link>
         </div>
@@ -135,7 +135,7 @@ export default function Header({ noPadding = false }: { noPadding?: boolean }) {
               boxShadow: "0 0 10px rgba(16, 185, 129, 0.4)"
             }}
           >
-            <span style={{ fontSize: "0.75rem", fontWeight: 700, fontFamily: "var(--font-inter), system-ui, sans-serif" }}>OP</span>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, fontFamily: "var(--font-inter), system-ui, sans-serif" }}>ME</span>
           </div>
         </div>
       </div>

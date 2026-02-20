@@ -71,9 +71,9 @@ function RobotPanelBody({
           fontFamily: "var(--font-mono), monospace",
         }}
       >
-        Unit /{" "}
+        Node /{" "}
         <span style={{ color: "var(--color-primary)" }}>
-          {robotId.replace("_", "-").toUpperCase()}
+          {robotId.replace(/robot_/i, "Node-").toUpperCase()}
         </span>
       </div>
 

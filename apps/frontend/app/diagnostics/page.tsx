@@ -17,10 +17,10 @@ export default function DiagnosticsPage() {
   const { robots, isConnected } = useFleetTelemetry();
 
   const mockLogs = [
-    { time: "02:50:11", node: "/robot_1/nav2", level: "INFO", msg: "Reached waypoint [3]" },
-    { time: "02:50:15", node: "/robot_2/slam", level: "WARN", msg: "Feature tracking degraded" },
+    { time: "02:50:11", node: "/node_1/nav2", level: "INFO", msg: "Reached waypoint [3]" },
+    { time: "02:50:15", node: "/node_2/slam", level: "WARN", msg: "Feature tracking degraded" },
     { time: "02:51:02", node: "/system/bridge", level: "INFO", msg: "HEARTBEAT active" },
-    { time: "02:52:45", node: "/robot_1/odom", level: "ERROR", msg: "Sensor drift exceeded tolerance" },
+    { time: "02:52:45", node: "/node_1/odom", level: "ERROR", msg: "Sensor drift exceeded tolerance" },
   ];
 
   return (
@@ -68,7 +68,7 @@ export default function DiagnosticsPage() {
                  {robots.map((robot) => (
                    <div key={robot.id} className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/50 flex flex-col gap-3">
                       <div className="flex items-center justify-between">
-                         <span className="text-xs font-black">{robot.id.toUpperCase()}</span>
+                         <span className="text-xs font-black">{robot.id.replace(/robot_/i, "Node-").toUpperCase()}</span>
                          <div className="px-2 py-0.5 rounded-full bg-green-100 text-[9px] font-black text-green-700">HEARTBEAT OK</div>
                       </div>
                       <div className="grid grid-cols-2 gap-2">

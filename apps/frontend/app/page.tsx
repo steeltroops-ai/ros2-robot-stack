@@ -64,7 +64,7 @@ function BatteryIndicator({ level }: { level: number }) {
 }
 
 // ─── Main dashboard ───────────────────────────────────────────────────────────
-function FleetDashboard() {
+function LabDashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -113,7 +113,7 @@ function FleetDashboard() {
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 flex-shrink-0" style={{ gap: "0.75rem" }}>
         <div className="metric-card">
-          <div className="metric-label" style={{ marginBottom: 4 }}>Connected Robots</div>
+          <div className="metric-label" style={{ marginBottom: 4 }}>Connected Nodes</div>
           <div className="flex items-center justify-between">
             <span className="metric-value" style={{ fontSize: "1.25rem" }}>{robots.length}</span>
             <div className="px-2 py-0.5 rounded bg-black/5 text-[0.625rem] font-bold">LIVE</div>
@@ -144,15 +144,15 @@ function FleetDashboard() {
         </div>
       </div>
 
-      {/* Robot Roster */}
+      {/* Agent Roster */}
       <div className="flex-1 min-h-0 flex flex-col">
         <div className="flex items-center justify-between px-2 mb-4">
           <div className="flex flex-col">
             <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--color-text-0)", letterSpacing: "-0.02em" }}>
-              Robot Roster
+              Active Agent Roster
             </h3>
             <span style={{ fontSize: "0.6875rem", color: "var(--color-text-3)" }}>
-              View and manage all connected robots
+              View and manage all active nodes in the lab network
             </span>
           </div>
         </div>
@@ -160,7 +160,7 @@ function FleetDashboard() {
         <div className="flex-1 overflow-y-auto min-h-0 px-1">
           {robots.length === 0 ? (
             <div className="panel flex flex-col items-center justify-center p-12">
-              <p className="text-sm font-medium text-zinc-400">Waiting for robots to connect...</p>
+              <p className="text-sm font-medium text-zinc-400">Waiting for agents to connect to the lab network...</p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -189,10 +189,10 @@ function FleetDashboard() {
                     {/* Unit ID */}
                     <div className="flex flex-col gap-0.5 min-w-[120px]">
                       <span style={{ fontSize: "0.625rem", fontWeight: 800, color: isActive ? "var(--color-primary)" : "var(--color-text-4)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                        Unit ID
+                        Node ID
                       </span>
                       <span style={{ fontSize: "0.875rem", fontWeight: 800, color: isActive ? "white" : "var(--color-text-0)", letterSpacing: "-0.01em", fontFamily: "var(--font-mono), monospace" }}>
-                        {robot.id.replace("_", "-").toUpperCase()}
+                        {robot.id.replace(/robot_/i, "Node-").toUpperCase()}
                       </span>
                     </div>
                     {/* Status */}
@@ -253,7 +253,7 @@ export default function Home() {
         </div>
       }
     >
-      <FleetDashboard />
+      <LabDashboard />
     </Suspense>
   );
 }

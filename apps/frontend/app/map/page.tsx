@@ -17,10 +17,10 @@ export default function MapPage() {
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-black tracking-tight text-foreground">
-              Facility Map
+              Lab Network Map
             </h1>
             <p className="text-sm text-muted-foreground font-medium">
-              Live view of all robot positions and environment
+              Live spatial view of all active agents and the test environment
             </p>
           </div>
           
@@ -62,8 +62,8 @@ export default function MapPage() {
                 {selectedId && (
                   <div className="absolute top-4 left-4 p-4 rounded-xl border border-border bg-white/90 backdrop-blur shadow-xl animate-in fade-in slide-in-from-left-4">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-primary">Selected Unit</span>
-                      <span className="text-xl font-black text-zinc-900">{selectedId.replace("_", "-").toUpperCase()}</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-primary">Selected Node</span>
+                      <span className="text-xl font-black text-zinc-900">{selectedId.replace(/robot_/i, "Node-").toUpperCase()}</span>
                       <div className="mt-2 flex items-center gap-4">
                          <div className="flex flex-col">
                             <span className="text-[8px] font-bold text-zinc-400">STATUS</span>

@@ -69,7 +69,7 @@ function DashboardPanelBody({
             letterSpacing: "0.06em",
           }}
         >
-          {selectedRobotId.replace("_", "-").toUpperCase()}
+          {selectedRobotId.replace(/robot_/i, "Node-").toUpperCase()}
         </span>
         <button
           onClick={onDeselect}
@@ -150,7 +150,7 @@ function DashboardIdleBody({
   return (
     <div className="flex flex-col gap-5 px-5 py-4">
       <p style={{ fontSize: "0.75rem", color: "var(--color-text-3)", lineHeight: 1.6 }}>
-        Select a robot from the roster to control it and view live telemetry here.
+        Select a node from the agent roster to control it and view live telemetry here.
       </p>
 
       <div className="flex flex-col gap-2">
@@ -164,10 +164,10 @@ function DashboardIdleBody({
             fontFamily: "var(--font-mono), monospace",
           }}
         >
-          Fleet Summary
+          Agent Summary
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <DataTile label="Online Units"     value={String(robotCount)} />
+          <DataTile label="Online Nodes"     value={String(robotCount)} />
           <DataTile label="Avg Battery"      value={`${avgBattery}%`} />
           <DataTile label="Network"          value={isConnected ? "32 ms" : "Offline"} />
           <DataTile label="Active Missions"  value="0" />
@@ -218,7 +218,7 @@ export function useDashboardPanel({
       });
     } else {
       setPanel({
-        title: "Fleet Overview",
+        title: "Agent Network",
         badge: isConnected ? "LIVE" : "OFFLINE",
         badgeVariant: isConnected ? "green" : "grey",
         content: (

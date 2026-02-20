@@ -23,14 +23,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Omniverse | Multi-Robot Fleet Management",
+  title: "Lab.View | Personal Robotics Lab",
   description:
-    "Multi-robot fleet management platform with 3D visualization and real-time control.",
+    "Personal robotics research and control interface with 3D visualization.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Omniverse",
+    title: "Lab.View",
   },
   icons: {
     icon: "/logo.webp",

@@ -19,7 +19,7 @@ import { useFleetTelemetry } from "@/hooks/useFleetTelemetry";
 const MAIN_NAV = [
   {
     id: "overview",
-    label: "Warehouse Ops",
+    label: "Control Center",
     href: "/",
     icon: <LayoutDashboard size={16} />,
   },
@@ -40,19 +40,19 @@ const MAIN_NAV = [
 const LAB_NAV = [
   {
     id: "hand",
-    label: "P2: Viral Hand",
+    label: "Bionic Hand",
     href: "/projects/hand",
     icon: <Hand size={16} />,
   },
   {
     id: "drone",
-    label: "P3: Explorer Drone",
+    label: "Quadrotor",
     href: "/projects/drone",
     icon: <Plane size={16} />,
   },
   {
     id: "swarm",
-    label: "P4: Hive Swarm",
+    label: "Drone Swarm",
     href: "/projects/swarm",
     icon: <Grid size={16} />,
   },
@@ -106,7 +106,7 @@ export default function Sidebar({
                  OMNIVERSE
                </span>
                <span style={{ fontSize: "0.625rem", fontWeight: 600, color: "var(--color-primary)", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "var(--font-mono), monospace" }}>
-                 [sys.lab]
+                 Personal R&D Lab
                </span>
             </div>
           )}
@@ -151,7 +151,7 @@ export default function Sidebar({
               fontFamily: "var(--font-inter), system-ui, sans-serif",
             }}
           >
-            {!isCollapsed && "OPERATIONS"}
+            {!isCollapsed && "CORE UTILITIES"}
           </div>
           <div className="flex flex-col gap-0.5">
             {MAIN_NAV.map((item) => {
@@ -197,7 +197,7 @@ export default function Sidebar({
               fontFamily: "var(--font-inter), system-ui, sans-serif",
             }}
           >
-            {!isCollapsed && "RESEARCH LABS"}
+            {!isCollapsed && "RESEARCH PROJECTS"}
           </div>
           <div className="flex flex-col gap-0.5">
             {LAB_NAV.map((item) => {
@@ -248,7 +248,7 @@ export default function Sidebar({
                 fontFamily: "var(--font-inter), system-ui, sans-serif",
               }}
             >
-              {isCollapsed ? "FLT" : "FLEET UNITS"}
+              {isCollapsed ? "NODES" : "ACTIVE NODES"}
             </span>
             {!isCollapsed && (
               <span
@@ -291,7 +291,7 @@ export default function Sidebar({
                   </span>
                   {!isCollapsed && (
                     <div className="flex-1 min-w-0 flex items-center justify-between">
-                      <span className="truncate">{robot.id.replace("_", "-").toUpperCase()}</span>
+                      <span className="truncate">{robot.id.replace(/robot_/i, "Node-").toUpperCase()}</span>
                       {isActive && <ChevronRight size={14} style={{ opacity: 0.5 }} />}
                     </div>
                   )}
@@ -311,7 +311,7 @@ export default function Sidebar({
           background: "rgba(0,0,0,0.2)",
         }}
       >
-         <Link href="/settings" className="flex items-center gap-3 w-full">
+           <Link href="/settings" className="flex items-center gap-3 w-full">
             <div
               className="flex items-center justify-center transition-colors"
               style={{
@@ -327,15 +327,15 @@ export default function Sidebar({
                 boxShadow: "0 0 10px rgba(16, 185, 129, 0.4)",
               }}
             >
-              OP
+              ME
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
                 <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--color-text-1)", fontFamily: "var(--font-mono), monospace", letterSpacing: "0.05em" }}>
-                  OPERATOR
+                  Developer
                 </div>
                 <div style={{ fontSize: "0.6rem", color: "var(--color-primary)", fontFamily: "var(--font-mono), monospace", letterSpacing: "0.1em" }}>
-                  SYS.ADMIN
+                  Admin
                 </div>
               </div>
             )}

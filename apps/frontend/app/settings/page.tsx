@@ -15,7 +15,7 @@ import {
 export default function SettingsPage() {
   const sections = [
     {
-      title: "System Parameters",
+      title: "Network Parameters",
       icon: Globe,
       items: [
         { label: "DDS Domain ID", value: "0", type: "input" },
@@ -43,7 +43,7 @@ export default function SettingsPage() {
             Control Settings
           </h1>
           <p className="text-sm text-muted-foreground font-medium">
-            Configure system-wide parameters and safety protocols
+            Configure network-wide parameters and safety protocols
           </p>
         </div>
 
@@ -53,11 +53,11 @@ export default function SettingsPage() {
               <div className="flex flex-col gap-1">
                 {[
                   { label: "General", icon: Settings, active: true },
-                  { label: "Robot Security", icon: Shield, active: false },
+                  { label: "Node Security", icon: Shield, active: false },
                   { label: "Devices", icon: Smartphone, active: false },
                   { label: "Notifications", icon: Bell, active: false },
                   { label: "Storage", icon: HardDrive, active: false },
-                  { label: "Operator Profile", icon: User, active: false },
+                  { label: "Developer Profile", icon: User, active: false },
                 ].map((item, i) => (
                   <button 
                     key={i}
