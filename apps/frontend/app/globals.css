@@ -5,107 +5,102 @@
 
 :root {
   /* 
-   * Theme: "Bento Monochrome"
-   * Soft, high-radius, Apple/Braun inspired aesthetic.
-   * High contrast black/white with soft gray backgrounds.
+   * Theme: "Liquid Glass"
+   * Deep translucent multi-layer glass with high-tech accents over rich landscapes.
    */
-  --background: #f2f2f5; /* Soft Gray/White Mesh feel */
-  --foreground: #09090b; /* Deep Technical Black */
+  --background: transparent;
+  --foreground: #e2e8f0;
   
-  --card: #ffffff;
-  --card-foreground: #09090b;
+  --card: rgba(20, 20, 24, 0.45);
+  --card-foreground: #ffffff;
   
-  --popover: #ffffff;
-  --popover-foreground: #09090b;
+  --popover: rgba(20, 20, 24, 0.65);
+  --popover-foreground: #ffffff;
   
-  --primary: #09090b; /* True Black for Actions */
-  --primary-foreground: #ffffff;
+  --primary: #10b981; /* Neon Green / Teal */
+  --primary-foreground: #000000;
   
-  --secondary: #f4f4f5; /* Lightened secondary for better contrast with black */
-  --secondary-foreground: #09090b;
+  --secondary: rgba(255, 255, 255, 0.05);
+  --secondary-foreground: #ffffff;
   
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a; /* Darker Neutral Gray */
+  --muted: rgba(255, 255, 255, 0.03);
+  --muted-foreground: #94a3b8;
   
-  --accent: #09090b; 
-  --accent-foreground: #ffffff;
+  --accent: rgba(16, 185, 129, 0.2); 
+  --accent-foreground: #10b981;
   
-  --destructive: #ff3b30; /* iOS Red */
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   
-  --border: #d1d1d6; /* Soft border */
-  --input: #e5e5ea;
-  --ring: #1c1c1e;
+  --border: rgba(255, 255, 255, 0.08); /* Thin transparent specular edge */
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: rgba(16, 185, 129, 0.5);
   
-  --radius: 1.25rem; /* Highly rounded "Bento" corners */
+  --radius: 0.75rem;
 
   /* Semantic Layout Tokens */
-  --color-surface-0: #f2f2f5; /* Main Background */
-  --color-surface-1: #ffffff; /* Sidebar (White) */
-  --color-surface-2: #e5e5ea; /* Hover */
-  --color-surface-3: #d1d1d6; /* Active */
-  --color-surface-4: #c7c7cc;
+  --color-surface-0: transparent;
+  --color-surface-1: rgba(10, 10, 12, 0.5); /* Sidebar */
+  --color-surface-2: rgba(255, 255, 255, 0.03);
+  --color-surface-3: rgba(255, 255, 255, 0.05);
+  --color-surface-4: rgba(255, 255, 255, 0.1);
   
-  --color-text-0: #09090b; /* Primary (Deep Black) */
-  --color-text-1: #27272a; /* Secondary */
-  --color-text-2: #52525b; /* Muted */
-  --color-text-3: #71717a; /* Placeholder */
-  --color-text-4: #a1a1aa; /* High Contrast Borders/Labels */
+  --color-text-0: #ffffff; 
+  --color-text-1: #cbd5e1; 
+  --color-text-2: #94a3b8; 
+  --color-text-3: #64748b; 
+  --color-text-4: #475569; 
   
-  --color-border-0: #e4e4e7; /* Subtle separator */
-  --color-border-1: #d4d4d8; /* Stronger border */
+  --color-border-0: rgba(255, 255, 255, 0.08); 
+  --color-border-1: rgba(255, 255, 255, 0.15); 
   
-  --color-success: #34c759;
-  --color-warning: #ffcc00;
-  --color-error: #ff3b30;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
 }
 
 .dark {
-  /* 
-   * Dark Mode: "Deep Bento"
-   * Pure black and dark grays.
-   */
-  --background: #000000;
-  --foreground: #ffffff;
+  --background: transparent;
+  --foreground: #e2e8f0;
   
-  --card: #1c1c1e;
+  --card: rgba(20, 20, 24, 0.45);
   --card-foreground: #ffffff;
   
-  --popover: #1c1c1e;
+  --popover: rgba(20, 20, 24, 0.65);
   --popover-foreground: #ffffff;
   
-  --primary: #ffffff;
+  --primary: #10b981;
   --primary-foreground: #000000;
   
-  --secondary: #2c2c2e;
+  --secondary: rgba(255, 255, 255, 0.05);
   --secondary-foreground: #ffffff;
   
-  --muted: #1c1c1e;
-  --muted-foreground: #98989d;
+  --muted: rgba(255, 255, 255, 0.03);
+  --muted-foreground: #94a3b8;
   
-  --accent: #ffffff;
-  --accent-foreground: #000000;
+  --accent: rgba(16, 185, 129, 0.2); 
+  --accent-foreground: #10b981;
   
-  --destructive: #ff453a;
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   
-  --border: #2c2c2e;
-  --input: #2c2c2e;
-  --ring: #ffffff;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: rgba(16, 185, 129, 0.5);
 
-  --color-surface-0: #000000;
-  --color-surface-1: #1c1c1e;
-  --color-surface-2: #2c2c2e;
-  --color-surface-3: #3a3a3c;
-  --color-surface-4: #48484a;
+  --color-surface-0: transparent;
+  --color-surface-1: rgba(10, 10, 12, 0.5); /* Sidebar */
+  --color-surface-2: rgba(255, 255, 255, 0.03);
+  --color-surface-3: rgba(255, 255, 255, 0.05);
+  --color-surface-4: rgba(255, 255, 255, 0.1);
   
   --color-text-0: #ffffff;
-  --color-text-1: #ebebf5;
-  --color-text-2: #ebebf599; /* 60% opacity */
-  --color-text-4: #3a3a3c;
+  --color-text-1: #cbd5e1;
+  --color-text-2: #94a3b8;
+  --color-text-4: #475569;
   
-  --color-border-0: #2c2c2e;
-  --color-border-1: #3a3a3c;
+  --color-border-0: rgba(255, 255, 255, 0.08);
+  --color-border-1: rgba(255, 255, 255, 0.15);
 }
 
 @theme {
@@ -148,20 +143,31 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    
+    /* Dramatic Landscape Wallpaper */
+    background-image: url('/bg-landscape.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-color: #050505;
   }
 
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-border rounded-full hover:bg-muted-foreground/50 transition-colors;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
 }
 
@@ -174,24 +180,37 @@
 }
 
 @layer components {
-  /* Bento Card Logic */
+  /* High-Tech Liquid Glass Panels */
   .metric-card {
-    background: var(--card);
+    background: rgba(20, 20, 24, 0.4);
+    backdrop-filter: blur(24px) saturate(120%);
+    -webkit-backdrop-filter: blur(24px) saturate(120%);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 1.25rem 1.5rem;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      0 8px 32px -4px rgba(0,0,0,0.5);
   }
   
   .metric-card:hover {
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    border-color: rgba(16, 185, 129, 0.4);
+    background: rgba(25, 25, 30, 0.5);
+    box-shadow: 
+      inset 0 1px 0 rgba(255,255,255,0.1),
+      inset 0 0 20px rgba(16,185,129,0.05),
+      0 12px 48px -4px rgba(0,0,0,0.6);
   }
 
   .metric-value {
-    @apply text-3xl font-semibold tracking-tight tabular-nums text-foreground;
+    @apply text-3xl font-mono tracking-tight tabular-nums;
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
   }
   .metric-label {
-    @apply text-xs font-medium uppercase tracking-wider text-muted-foreground mt-1;
+    @apply text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)] mt-1;
+    font-family: var(--font-mono), monospace;
   }
 
   .status-dot {
@@ -199,23 +218,29 @@
   }
   .status-dot--online {
     background-color: var(--color-success);
-    box-shadow: 0 0 8px var(--color-success);
+    box-shadow: 0 0 12px 2px var(--color-success);
   }
   .status-dot--offline {
     background-color: var(--muted-foreground);
+    opacity: 0.5;
   }
   .status-dot--error {
     background-color: var(--color-error);
-    box-shadow: 0 0 8px var(--color-error);
+    box-shadow: 0 0 12px 2px var(--color-error);
   }
 
-  /* Panel Logic (Bento Container) */
+  /* Structural Panels with Glass */
   .panel {
-    background: var(--card);
+    background: rgba(15, 15, 20, 0.55);
+    backdrop-filter: blur(28px) saturate(140%);
+    -webkit-backdrop-filter: blur(28px) saturate(140%);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 1.25rem;
     overflow: hidden;
     transition: all 0.2s ease;
+    box-shadow: 
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      0 32px 128px rgba(0, 0, 0, 0.8);
   }
   
   .panel-header {
@@ -225,27 +250,33 @@
     justify-content: space-between;
     padding: 0 1.5rem;
     border-bottom: 1px solid var(--border);
-    background: var(--color-surface-1);
+    background: rgba(0, 0, 0, 0.2);
   }
 
   .panel-title {
-    font-size: 0.8125rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: var(--font-mono), monospace;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-0);
+    letter-spacing: 0.1em;
+    color: var(--color-text-1);
   }
 
-  /* Robot List Row */
+  /* Data Rows */
   .robot-row {
-     @apply grid items-center gap-4 px-5 py-3 border-b border-border cursor-pointer transition-colors hover:bg-muted/50;
-    grid-template-columns: 1fr auto auto auto auto;
+     @apply grid items-center gap-4 px-5 py-3 border-b border-[var(--color-border-0)] transition-all cursor-pointer;
+     grid-template-columns: 1fr auto auto auto auto;
+     background: transparent;
+  }
+  .robot-row:hover {
+    background: rgba(255,255,255,0.04);
   }
   .robot-row:last-child {
     border-bottom: none;
   }
   .robot-row--selected {
-    background-color: var(--muted);
-    border-left: 3px solid var(--primary);
+    background: linear-gradient(90deg, rgba(16,185,129,0.15) 0%, transparent 100%);
+    border-left: 2px solid var(--primary);
   }
 }
+
