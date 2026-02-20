@@ -1,6 +1,5 @@
 "use client";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useFleetTelemetry } from "@/hooks/useFleetTelemetry";
 import { 
   Activity, 
@@ -25,8 +24,8 @@ export default function DiagnosticsPage() {
   ];
 
   return (
-    <DashboardLayout>
-      <div className="flex flex-col h-full gap-6">
+    <div className="w-full h-full p-2 sm:p-4 md:p-6 lg:p-8 animate-in fade-in duration-200 overflow-y-auto">
+<div className="flex flex-col h-full gap-6">
         {/* Header Section */}
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-black tracking-tight text-foreground">
@@ -122,6 +121,6 @@ export default function DiagnosticsPage() {
            </div>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

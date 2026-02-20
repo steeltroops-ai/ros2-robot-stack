@@ -1,17 +1,14 @@
 "use client";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useFleetTelemetry } from "@/hooks/useFleetTelemetry";
-import RobotControlPanel from "@/components/telemetry/RobotControlPanel";
+import { useRobotPanel } from "@/components/layout/panel-content/RobotPanelContent";
 import dynamic from "next/dynamic";
-import { use } from "react";
+import { use, useEffect, useCallback } from "react";
 
 const RobotViewer = dynamic(
   () => import("@/components/scene/RobotViewer"),
   { ssr: false },
 );
-
-
 
 export default function RobotPage({
   params,
@@ -19,46 +16,39 @@ export default function RobotPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { robots } = useFleetTelemetry();
+  const { robots, sendControl, sendNavigationGoal, mapData, pathData, subscribeToRobot, unsubscribeFromRobot } =
+    useFleetTelemetry();
   const robot = robots.find((r) => r.id === id);
 
+  // Subscribe when page mounts
+  useEffect(() => {
+    subscribeToRobot(id);
+    return () => unsubscribeFromRobot(id);
+  }, [id, subscribeToRobot, unsubscribeFromRobot]);
+
+  const handleNavigationGoal = useCallback(
+    (x: number, y: number) => sendNavigationGoal(id, x, y),
+    [id, sendNavigationGoal]
+  );
+
+  // ── Inject content into the shared right panel ────────────────────────────
+  useRobotPanel({
+    robotId: id,
+    robot: robot
+      ? { x: robot.x, y: robot.y, theta: robot.theta, battery: robot.battery }
+      : undefined,
+    mapData,
+    sendControl,
+  });
+
   return (
-    <DashboardLayout 
-      noPadding 
-      rightPanel={
-        <div className="flex flex-col h-full">
-          {/* Panel Header - Integrated with Shell Header */}
-          <div 
-            className="flex items-center justify-between px-6"
-            style={{
-              height: 64, // Exact match to Global Header
-              flexShrink: 0
-            }}
-          >
-            <span style={{ fontSize: "1rem", fontWeight: 600, color: "var(--color-text-0)", letterSpacing: "-0.01em" }}>
-              Control Station
-            </span>
-            <div className="flex items-center gap-2 px-2 py-1 rounded-full" style={{ background: "rgba(34, 197, 94, 0.1)" }}>
-               <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-               <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--color-success)" }}>LIVE</span>
-            </div>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <RobotControlPanel robotId={id} />
-          </div>
-        </div>
-      }
-    >
-      <div className="w-full h-full relative">
-        <RobotViewer
-          robotId={id}
-          pose={
-            robot
-              ? { x: robot.x, y: robot.y, theta: robot.theta }
-              : { x: 0, y: 0, theta: 0 }
-          }
-        />
-      </div>
-    </DashboardLayout>
+    <div className="w-full h-full relative rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] bg-black/40">
+      <RobotViewer
+        robotId={id}
+        pose={robot ? { x: robot.x, y: robot.y, theta: robot.theta } : { x: 0, y: 0, theta: 0 }}
+        onNavigationGoal={handleNavigationGoal}
+        pathData={pathData}
+      />
+    </div>
   );
 }

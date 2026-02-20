@@ -40,6 +40,7 @@ export const metadata: Metadata = {
 };
 
 import ErrorBoundary from "@/components/ErrorBoundary";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 
 export default function RootLayout({
   children,
@@ -54,7 +55,9 @@ export default function RootLayout({
         style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
       >
         <ErrorBoundary>
-          {children}
+          <DashboardLayout>
+            {children}
+          </DashboardLayout>
         </ErrorBoundary>
       </body>
     </html>

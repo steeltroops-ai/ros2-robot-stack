@@ -1,6 +1,5 @@
 "use client";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
 import { 
   Settings, 
   Shield, 
@@ -36,8 +35,8 @@ export default function SettingsPage() {
   ];
 
   return (
-    <DashboardLayout>
-      <div className="flex flex-col h-full gap-8 max-w-4xl">
+    <div className="w-full h-full p-2 sm:p-4 md:p-6 lg:p-8 animate-in fade-in duration-200 overflow-y-auto">
+<div className="flex flex-col h-full gap-8 max-w-4xl">
         {/* Header Section */}
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-black tracking-tight text-foreground">
@@ -120,6 +119,6 @@ export default function SettingsPage() {
            </div>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

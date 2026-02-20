@@ -1,6 +1,5 @@
 "use client";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
 import { MapDisplay } from "@/components/map/MapDisplay";
 import { useFleetTelemetry } from "@/hooks/useFleetTelemetry";
 import { Map as MapIcon, Layers, Maximize2, RotateCcw } from "lucide-react";
@@ -12,16 +11,16 @@ export default function MapPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   return (
-    <DashboardLayout>
-      <div className="flex flex-col h-full gap-6">
+    <div className="w-full h-full p-2 sm:p-4 md:p-6 lg:p-8 animate-in fade-in duration-200 overflow-y-auto">
+<div className="flex flex-col h-full gap-6">
         {/* Header Section */}
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-black tracking-tight text-foreground">
-              Global Spatial Awareness
+              Facility Map
             </h1>
             <p className="text-sm text-muted-foreground font-medium">
-              Real-time occupancy grid mapping across all namespaced units
+              Live view of all robot positions and environment
             </p>
           </div>
           
@@ -101,9 +100,9 @@ export default function MapPage() {
         {/* Footnote */}
         <div className="flex items-center gap-2 px-1 opacity-40">
            <MapIcon size={12} />
-           <span className="text-[10px] uppercase font-black tracking-widest">DDS SLAM PROTOCOL • ACTIVE</span>
+           <span className="text-[10px] uppercase font-black tracking-widest text-zinc-500">MAP SYSTEM OPERATIONAL</span>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }
