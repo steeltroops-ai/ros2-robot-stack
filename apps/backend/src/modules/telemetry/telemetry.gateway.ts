@@ -15,6 +15,7 @@ export class TelemetryGateway {
   private node: rclnodejs.Node | null = null;
   private robots: Map<string, RobotTelemetry> = new Map();
   private lastUpdate: Map<string, number> = new Map();
+  private lastFleetUpdate: Map<string, number> = new Map();
 
   private cmdVelPubs: Map<string, rclnodejs.Publisher<any>> = new Map();
   private goalPubs: Map<string, rclnodejs.Publisher<any>> = new Map();
@@ -298,12 +299,13 @@ export class TelemetryGateway {
     if (now - last > 16) {
         this.io.to(`robot:${robotId}`).emit("telemetry", data);
         this.lastUpdate.set(robotId, now);
+    }
 
-        // 2. Sampled Frequency (5Hz) -> To 'fleet' (Dashboard List)
-        // We only send to fleet if it's been ~200ms
-        if (Math.random() < 0.1) {
-            this.io.to("fleet").emit("telemetry", data);
-        }
+    // 2. Throttled Frequency (5Hz) -> To 'fleet' (Dashboard List)
+    const lastFleet = this.lastFleetUpdate.get(robotId) || 0;
+    if (now - lastFleet > 200) {
+        this.io.to("fleet").emit("telemetry", data);
+        this.lastFleetUpdate.set(robotId, now);
     }
   }
 

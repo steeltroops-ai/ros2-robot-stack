@@ -7,9 +7,9 @@ This file is the agent's long-term working memory. Read it at the start of every
 
 ## 1. Project Identity
 
-- **Name**: Multi-Layer Robotics Platform (ros2-robot-stack)
+- **Name**: The Omniverse Robotics Lab (ros2-robot-stack)
 - **Maintainer**: Mayank (steeltroops.ai@gmail.com)
-- **Flagship**: Warehouse AMR Fleet with AI Perception
+- **Flagship**: Multi-Disciplinary Robotics Portfolio (AMR, Hand, Drone, Swarm)
 - **Vision Doc**: `docs/VISION.md`
 - **Roadmap**: `docs/ROADMAP.md`
 - **Architecture**: `docs/ARCHITECTURE.md`

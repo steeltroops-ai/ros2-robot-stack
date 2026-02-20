@@ -68,12 +68,17 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
 
     for (let i = 0; i < data.length; i++) {
       const val = data[i];
-      let r = 229, g = 229, b = 234; // unknown (#e5e5ea)
+      let r = 5, g = 5, b = 5, a = 0; // unknown
 
       if (val === 0) {
-        r = 255; g = 255; b = 255; // free (#ffffff)
+        // free space - faint frosted glass
+        r = 255; g = 255; b = 255; a = 15;
       } else if (val === 100) {
-        r = 28; g = 28; b = 30; // occupied (#1c1c1e)
+        // occupied - bright neon primary
+        r = 16; g = 185; b = 129; a = 255;
+      } else if (val > 0) {
+        // partial occupied - glowing edge
+        r = 16; g = 185; b = 129; a = Math.max(80, Math.floor(val * 2.55));
       }
 
       const row = Math.floor(i / width);
@@ -83,7 +88,7 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
       imgData.data[targetIndex * 4 + 0] = r;
       imgData.data[targetIndex * 4 + 1] = g;
       imgData.data[targetIndex * 4 + 2] = b;
-      imgData.data[targetIndex * 4 + 3] = 255;
+      imgData.data[targetIndex * 4 + 3] = val === -1 ? 0 : a; // Transparent for unknown
     }
 
     ctx.putImageData(imgData, 0, 0);
@@ -99,31 +104,34 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
       const canvasY = height - py;
       const canvasX = px;
 
-      // Robot dot — primary black
+      // Robot dot — primary neon glow
       const isSelected = selectedId === robot.id;
       
       if (isSelected) {
-        ctx.fillStyle = "rgba(34, 211, 238, 0.3)";
+        ctx.fillStyle = "rgba(16, 185, 129, 0.3)";
         ctx.beginPath();
         ctx.arc(canvasX, canvasY, 12, 0, 2 * Math.PI);
         ctx.fill();
         
-        ctx.strokeStyle = "#22d3ee";
+        ctx.strokeStyle = "#10b981";
         ctx.lineWidth = 2;
         ctx.stroke();
       }
 
-      ctx.fillStyle = isSelected ? "#22d3ee" : "#1c1c1e";
+      ctx.fillStyle = isSelected ? "#10b981" : "#050505";
+      ctx.strokeStyle = "#10b981";
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(canvasX, canvasY, 4, 0, 2 * Math.PI);
       ctx.fill();
+      ctx.stroke();
 
       // Heading line
       const headLen = 8;
       const dx = Math.cos(robot.theta) * headLen;
       const dy = Math.sin(robot.theta) * headLen;
 
-      ctx.strokeStyle = isSelected ? "#22d3ee" : "#1c1c1e";
+      ctx.strokeStyle = isSelected ? "#10b981" : "#10b981";
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(canvasX, canvasY);
@@ -134,9 +142,9 @@ export function MapDisplay({ mapData, robots, onSelectRobot, selectedId }: MapDi
 
   if (!mapData) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-         <div className="w-8 h-8 rounded-full border-2 border-zinc-200 border-t-zinc-400 animate-spin" />
-         <span className="text-[10px] font-mono font-bold text-zinc-400 tracking-widest uppercase animate-pulse">Scanning Grid...</span>
+      <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-[var(--color-surface-0)] border border-[var(--color-border-0)]/50 backdrop-blur-sm">
+         <div className="w-8 h-8 rounded-full border-2 border-[var(--color-primary)]/20 border-t-[var(--color-primary)] animate-spin" />
+         <span className="text-[10px] font-mono font-bold text-[var(--color-primary)] tracking-widest uppercase animate-pulse">Scanning Grid...</span>
       </div>
     );
   }

@@ -3,7 +3,7 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState, useMemo } from "react";
 import * as THREE from "three";
-import { socket } from "@/utils/socket";
+import { getSocket } from "@/utils/socket";
 
 // Simplified Scan Msg
 interface ScanMsg {
@@ -45,7 +45,8 @@ export function LidarScanner({ robotId }: LidarScannerProps) {
 
   // Socket Listener
   useEffect(() => {
-    if (!socket) return;
+    if (typeof window === "undefined") return;
+    const socket = getSocket();
     
     const handler = (data: ScanMsg) => {
         setScanData(data);

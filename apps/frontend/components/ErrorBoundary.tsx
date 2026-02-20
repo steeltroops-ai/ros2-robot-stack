@@ -517,45 +517,45 @@ class ErrorBoundary extends Component<Props, State> {
                                 </div>
                               </div>
 
-                                {/* System Diagnostics */}
-                                <div className="pt-6 border-t border-zinc-200 space-y-3">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-[10px] uppercase tracking-widest text-zinc-700 font-black">
-                                      System Diagnostics
-                                    </span>
+                              {/* System Diagnostics */}
+                              <div className="pt-6 border-t border-zinc-200 space-y-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] uppercase tracking-widest text-zinc-700 font-black">
+                                    System Diagnostics
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                  <div className="bg-zinc-50 border border-zinc-200 p-3 rounded-xl space-y-1">
+                                    <div className="text-[8px] uppercase tracking-tighter text-zinc-400 font-bold">Memory Usage</div>
+                                    <div className="text-[10px] font-mono font-black text-black">
+                                      {(performance as any).memory ? `${Math.round((performance as any).memory.usedJSHeapSize / 1048576)}MB` : "UNAVAILABLE"}
+                                    </div>
                                   </div>
-                                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                    <div className="bg-zinc-50 border border-zinc-200 p-3 rounded-xl space-y-1">
-                                      <div className="text-[8px] uppercase tracking-tighter text-zinc-400 font-bold">Memory Usage</div>
-                                      <div className="text-[10px] font-mono font-black text-black">
-                                        {(performance as any).memory ? `${Math.round((performance as any).memory.usedJSHeapSize / 1048576)}MB` : "UNAVAILABLE"}
-                                      </div>
+                                  <div className="bg-zinc-50 border border-zinc-200 p-3 rounded-xl space-y-1">
+                                    <div className="text-[8px] uppercase tracking-tighter text-zinc-400 font-bold">Latency</div>
+                                    <div className="text-[10px] font-mono font-black text-black">
+                                      {performance.now().toFixed(0)}ms
                                     </div>
-                                    <div className="bg-zinc-50 border border-zinc-200 p-3 rounded-xl space-y-1">
-                                      <div className="text-[8px] uppercase tracking-tighter text-zinc-400 font-bold">Latency</div>
-                                      <div className="text-[10px] font-mono font-black text-black">
-                                        {performance.now().toFixed(0)}ms
-                                      </div>
-                                    </div>
-                                    <div className="bg-zinc-50 border border-zinc-200 p-3 rounded-xl space-y-1">
-                                      <div className="text-[8px] uppercase tracking-tighter text-zinc-400 font-bold">Path</div>
-                                      <div className="text-[10px] font-mono font-black text-black truncate italic">
-                                        {window.location.pathname}
-                                      </div>
+                                  </div>
+                                  <div className="bg-zinc-50 border border-zinc-200 p-3 rounded-xl space-y-1">
+                                    <div className="text-[8px] uppercase tracking-tighter text-zinc-400 font-bold">Path</div>
+                                    <div className="text-[10px] font-mono font-black text-black truncate italic">
+                                      {window.location.pathname}
                                     </div>
                                   </div>
                                 </div>
+                              </div>
 
-                                {/* Debug Context */}
-                                <div className="pt-8 border-t border-zinc-100 space-y-2 opacity-50">
-                                  <div className="flex justify-between text-[9px] font-mono uppercase tracking-widest text-zinc-400 font-bold">
-                                    <span>System Identity</span>
-                                    <span>{new Date().toISOString()}</span>
-                                  </div>
-                                  <div className="text-[9px] font-mono text-zinc-500 truncate font-medium uppercase tracking-tighter">
-                                    UA: {window.navigator.userAgent}
-                                  </div>
+                              {/* Debug Context */}
+                              <div className="pt-8 border-t border-zinc-100 space-y-2 opacity-50">
+                                <div className="flex justify-between text-[9px] font-mono uppercase tracking-widest text-zinc-400 font-bold">
+                                  <span>System Identity</span>
+                                  <span>{new Date().toISOString()}</span>
                                 </div>
+                                <div className="text-[9px] font-mono text-zinc-500 truncate font-medium uppercase tracking-tighter">
+                                  UA: {window.navigator.userAgent}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>

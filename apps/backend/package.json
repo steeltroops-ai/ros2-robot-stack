@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "dev": "bun --watch src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "build": "bun build ./src/index.ts --outdir ./dist --target node",
     "start": "bun src/index.ts",
     "rebuild": "node node_modules/rclnodejs/scripts/generate_messages.js",
@@ -14,7 +14,8 @@
     "lint": "echo 'No lint configured for backend'"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "tsx": "^4.21.0"
   },
   "peerDependencies": {
     "typescript": "^5"
